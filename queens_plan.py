@@ -7,6 +7,7 @@ class QueensPlan(Plan):
 		if (gene is None):
 			self.gene = []
 		self.size = size
+		self._fitness = None
 		
 	def get_random_gene(self):
 		gene = []
@@ -23,6 +24,8 @@ class QueensPlan(Plan):
 		return child
 		
 	def get_fitness_value(self):
+		if self._fitness is not None:
+			return self._fitness
 		cost = 0
 		for i in range(self.size):
 			for j in range(self.size):
@@ -30,7 +33,8 @@ class QueensPlan(Plan):
 				cost += 1 if self.gene[i] == self.gene[j] else 0
 				cost += 1 if self.gene[i] - i == self.gene[j] - j else 0
 				cost += 1 if self.gene[i] + i == self.gene[j] + j else 0
-		return -cost
+		self._fitness = -cost
+		return self._fitness
 		
 	def get_optimal_value(self):
 		return 0
