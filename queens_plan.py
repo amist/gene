@@ -1,4 +1,5 @@
 from random import randint
+from genetic_executor import GeneticExecutor
 
 class QueensPlan:
 	def __init__(self, size = 8, gene = None):
@@ -15,7 +16,6 @@ class QueensPlan:
 	def get_child(self, parent2):
 		child = QueensPlan(self.size)
 		for i in range(self.size):
-			#print i
 			child.gene.append(self.gene[i] if randint(0, 1) == 0 else parent2.gene[i])
 			if randint(1, self.size) == 1:
 				child.gene[i] = randint(1, self.size)
@@ -33,9 +33,10 @@ class QueensPlan:
 		
 	def get_optimal_value(self):
 		return 0
-		
-		
-class StopQueensPlan(QueensPlan):
-	def __init__(self, size, gene):
-		self.size = size
-		self.gene = gene
+
+if __name__ == '__main__':
+	qp = QueensPlan()
+	ge = GeneticExecutor(qp)
+	solution = ge.get_solution()
+	print solution.gene
+	

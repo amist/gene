@@ -1,4 +1,7 @@
+#from population import Population
+#from queens_plan import QueensPlan
 from random import randint
+import copy
 
 class Population:
 	def __init__(self, size = 200, expansion_factor = 5):
@@ -33,3 +36,22 @@ class Population:
 		for i in range(len(self.population)):
 			print 'printing plan number %d' % i
 			print self.population[i].gene
+
+class GeneticExecutor:
+
+	def __init__(self, individual_instance):
+		self.individual_instance = copy.deepcopy(individual_instance)
+		
+	def get_solution(self):
+		population = Population()
+		for i in range(10):
+			plan = copy.deepcopy(self.individual_instance)
+			plan.gene = plan.get_random_gene()
+			population.add_individual(plan)
+		
+		for i in range(100):
+			print 'Processing generation %d' % i
+			population.process_generation()
+			if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
+				break;
+		return population.population[0]
