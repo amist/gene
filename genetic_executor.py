@@ -39,13 +39,13 @@ class Population:
 			
 class Plan:
 	def get_random_gene(self):
-		return None
+		raise NotImplementedError('You have to implemtent a get_random_gene function')
 	
 	def get_child(self, parent2):
-		return None
+		raise NotImplementedError('You have to implemtent a get_child function')
 		
 	def get_fitness_value(self):
-		return None
+		raise NotImplementedError('You have to implemtent a get_fitness_value function')
 		
 	def get_optimal_value(self):
 		return None
