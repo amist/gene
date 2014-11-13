@@ -36,20 +36,38 @@ class Population:
 		for i in range(len(self.population)):
 			print 'printing plan number %d' % i
 			print self.population[i].gene
+			
+class Plan:
+	def get_random_gene(self):
+		return None
+	
+	def get_child(self, parent2):
+		return None
+		
+	def get_fitness_value(self):
+		return None
+		
+	def get_optimal_value(self):
+		return None
+		
+	def print_plan(self):
+		return
 
 class GeneticExecutor:
 
-	def __init__(self, individual_instance):
+	def __init__(self, individual_instance, initial_population_size = 10, max_generations_number = 100):
 		self.individual_instance = copy.deepcopy(individual_instance)
+		self.initial_population_size = initial_population_size
+		self.max_generations_number = max_generations_number
 		
 	def get_solution(self):
 		population = Population()
-		for i in range(10):
+		for i in range(self.initial_population_size):
 			plan = copy.deepcopy(self.individual_instance)
 			plan.gene = plan.get_random_gene()
 			population.add_individual(plan)
 		
-		for i in range(100):
+		for i in range(self.max_generations_number):
 			print 'Processing generation %d' % i
 			population.process_generation()
 			if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
