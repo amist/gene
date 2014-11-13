@@ -37,11 +37,12 @@ class Population:
 		self._sort_population()
 		#self._distinct_population()
 		self._cut_population()
+		#self.population[0].print_plan()
 		
 	def _expand_population(self):
 		for i in range(self.size * (self.expansion_factor - 1)):
-			#self.population.append(self._get_individual_with_uniform_choice().get_child(self._get_individual_with_uniform_choice()))
-			self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
+			self.population.append(self._get_individual_with_uniform_choice().get_child(self._get_individual_with_uniform_choice()))
+			#self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
 		
 	def _sort_population(self):
 		self.population.sort(key=lambda x: -x.get_fitness_value())
@@ -85,6 +86,7 @@ class GeneticExecutor:
 		for i in range(self.max_generations_number):
 			print 'Processing generation %d' % i
 			population.process_generation()
+			print '  Current maximum fitness value = %d' % population.population[0].get_fitness_value()
 			if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
 				break;
 		return population.population[0]
