@@ -54,8 +54,8 @@ class Population:
         self.population = self.population[0:self.size - 1]
             
 class Plan:
-    def get_random_gene(self):
-        raise NotImplementedError('You have to implemtent a get_random_gene function')
+    def get_random_chromosome(self):
+        raise NotImplementedError('You have to implemtent a get_random_chromosome function')
     
     def get_child(self, parent2):
         raise NotImplementedError('You have to implemtent a get_child function')
@@ -80,7 +80,7 @@ class GeneticExecutor:
         population = Population()
         for i in range(self.initial_population_size):
             plan = copy.deepcopy(self.individual_instance)
-            plan.gene = plan.get_random_gene()
+            plan.chromosome = plan.get_random_chromosome()
             population.add_individual(plan)
         
         for i in range(self.max_generations_number):
