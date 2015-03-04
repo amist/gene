@@ -1,6 +1,7 @@
 #from random import randint
 import random
 import copy
+import multiprocessing
 
 class Population:
     def __init__(self, size = 200, expansion_factor = 5):
@@ -29,18 +30,35 @@ class Population:
             upto += f
         assert False, "In _get_individual_with_weighted_choice. Shouldn't get here"
         
+    def _calculate_fitness_concurrently(self, individual, i, res_dict):
+        res_dict[i] = individual.get_fitness_value()
+        
+    def _calculate_fintesses(self):
+        manager = multiprocessing.Manager()
+        res_dict = manager.dict()
+        jobs = []
+        for i in range(len(self.population)):
+            p = multiprocessing.Process(target=self._calculate_fitness_concurrently(self.population[i], i, res_dict))
+            jobs.append(p)
+            p.start()
+        for job in jobs:
+            job.join()
+        for i in range(len(self.population)):
+            self.population[i]._fitness = res_dict[i]
+        
     def add_individual(self, individual):
         self.population.append(individual)
         
     def process_generation(self):
         self._expand_population()
+#         self._calculate_fintesses()
         self._sort_population()
         #self._distinct_population()
         self._cut_population()
         #self.population[0].print_plan()
         
     def _expand_population(self):
-        for i in range(self.size * (self.expansion_factor - 1)):
+        for _ in range(self.size * (self.expansion_factor - 1)):
             self.population.append(self._get_individual_with_uniform_choice().get_child(self._get_individual_with_uniform_choice()))
             #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         

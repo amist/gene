@@ -11,7 +11,7 @@ class QueensPlan(Plan):
         
     def get_random_chromosome(self):
         chromosome = []
-        for i in range(self.size):
+        for _ in range(self.size):
             chromosome.append(randint(0, self.size - 1))
         return chromosome
         
