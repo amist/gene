@@ -1,4 +1,4 @@
-#import time
+import time
 from bisect import bisect_right
 
 class Car(object):
@@ -10,6 +10,8 @@ class Car(object):
         self.speed = 0
         self.acceleration = 1
         self.margin = 10
+        self.last_lane_switch = 0
+        self.patience = 100
         
     
     def run(self):
@@ -29,6 +31,23 @@ class Car(object):
             #    print('---> run. position %d, speed %d, front car %d' % (self.position, self.speed, front_car.position))
             self.run()
             self.accelerate()
+            if right_lane is not None:
+                keys = [car.position for car in right_lane]
+                lane_back_car_index = bisect_right(keys, self.position)
+                lane_front_car_index = lane_back_car_index + 1
+                if lane_back_car_index == 0:
+                    lane_back_car = None
+                else:
+                    lane_back_car = right_lane[lane_back_car_index-1]
+                    
+                if lane_front_car_index > len(right_lane):
+                    lane_front_car = None
+                else:
+                    lane_front_car = right_lane[lane_front_car_index-1]
+                    #print('lane front car %d' % lane_front_car.position)
+                if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin) and (self.position - self.last_lane_switch > self.patience):
+                    self.lane -= 1
+                    self.last_lane_switch = self.position
         else:
             if left_lane is not None:
                 keys = [car.position for car in left_lane]
@@ -53,8 +72,11 @@ class Car(object):
                     lane_front_car = left_lane[lane_front_car_index-1]
                     #print('lane front car %d' % lane_front_car.position)
                     
-                if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin):
+                if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin) and (self.position - self.last_lane_switch > self.patience):
                     self.lane += 1
+                    self.last_lane_switch = self.position
+                    self.run()
+                    self.accelerate()
                 else:
                     self.speed = 0
             else:
@@ -125,7 +147,7 @@ def run_animation(animate=True):
         plt.ion()
         plt.show()
     
-    road = Road(2, 1000)
+    road = Road(2, 2000)
     road.cars = [Car(0, 5, 4), Car(0, 4, 6), Car(0, 3, 5), Car(0, 2, 5), Car(0, 1, 6), Car(0, 0, 6),
                 Car(1, 5, 7), Car(1, 4, 8), Car(1, 3, 9), Car(1, 2, 8), Car(1, 1, 7), Car(1, 0, 9)]
     
@@ -140,13 +162,18 @@ def run_animation(animate=True):
             plt.clf()
             plt.grid()
             plt.plot(x_points, y_points, 'ro')
-            # focus position in animation
-            #fcp = road.cars[-1].position
-            fcp = road.lanes[0][-1].position
-            wd = 150
-            plt.axis((fcp - wd, fcp + wd, -0.5, 1.5))
+            
+            focus_animation = False
+            if focus_animation:
+                # focus position in animation
+                fcp = road.cars[-1].position
+                #fcp = road.lanes[0][-1].position
+                wd = 350
+                plt.axis((fcp - wd, fcp + wd, -0.5, 1.5))
+            else:
+                plt.axis((0, road.length, -0.5, 1.5))
             plt.draw()
-            #time.sleep(0.01)
+            #time.sleep(0.1)
         
 if __name__ == '__main__':
     run_animation(animate=True)
