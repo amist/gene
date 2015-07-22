@@ -38,49 +38,46 @@ class Car(object):
         else:
             return 'lane: %d, pos: %d, speed: %d, base speed: %d\n' % (self.lane, self.position, self.speed, self.base_speed)
     
+    def is_lane_available(self, lane):
+        if lane is None:
+            return False
+        
+        keys = [car.position for car in lane]
+        lane_back_car_index = bisect_right(keys, self.position)
+        lane_front_car_index = lane_back_car_index + 1
+        if lane_back_car_index == 0:
+            lane_back_car = None
+        else:
+            lane_back_car = lane[lane_back_car_index-1]
+            
+        if lane_front_car_index > len(lane):
+            lane_front_car = None
+        else:
+            lane_front_car = lane[lane_front_car_index-1]
+            
+        if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin) and (self.position - self.last_lane_switch > self.patience):
+            return True
+            
+            
+    def is_front_car_far(self, front_car):
+        if front_car is None or front_car.position > self.position + self.speed:
+            return True
+    
         
     def drive(self, front_car, back_car, right_lane, left_lane):
-        if front_car is None or front_car.position > self.position + self.speed:
+        if self.is_front_car_far(front_car):
             self.run()
             self.accelerate()
-            if right_lane is not None:
-                keys = [car.position for car in right_lane]
-                lane_back_car_index = bisect_right(keys, self.position)
-                lane_front_car_index = lane_back_car_index + 1
-                if lane_back_car_index == 0:
-                    lane_back_car = None
-                else:
-                    lane_back_car = right_lane[lane_back_car_index-1]
-                    
-                if lane_front_car_index > len(right_lane):
-                    lane_front_car = None
-                else:
-                    lane_front_car = right_lane[lane_front_car_index-1]
-                if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin) and (self.position - self.last_lane_switch > self.patience):
-                    self.switch_lane(self.lane - 1)
-                    self.last_lane_switch = self.position
+            if self.is_lane_available(right_lane):
+                self.switch_lane(self.lane - 1)
+                self.last_lane_switch = self.position
         else:
-            if left_lane is not None:
-                keys = [car.position for car in left_lane]
-                lane_back_car_index = bisect_right(keys, self.position)
-                lane_front_car_index = lane_back_car_index + 1
-                if lane_back_car_index == 0:
-                    lane_back_car = None
-                else:
-                    lane_back_car = left_lane[lane_back_car_index-1]
-                    
-                if lane_front_car_index > len(left_lane):
-                    lane_front_car = None
-                else:
-                    lane_front_car = left_lane[lane_front_car_index-1]
-                    
-                if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin) and (self.position - self.last_lane_switch > self.patience):
-                    self.switch_lane(self.lane + 1)
-                    self.last_lane_switch = self.position
-                    self.run()
-                    self.accelerate()
-                else:
-                    self.speed = 0
+            if self.is_lane_available(left_lane):
+                self.switch_lane(self.lane + 1)
+                self.last_lane_switch = self.position
+                
+                self.run()
+                self.accelerate()
             else:
                 self.speed = 0
             
