@@ -1,7 +1,13 @@
+import inspect
+import sys
+import traceback
 from traffic import Car
 from traffic import Road
 
-if __name__ == '__main__':
+success = True
+
+
+def test_run_acceptance_test():
     road_length = 1000
     lanes_number = 2
     road = Road(lanes_number, road_length)
@@ -53,3 +59,95 @@ if __name__ == '__main__':
         assert road.finished_cars[9].lane_switches == 2
         assert road.finished_cars[10].lane_switches == 4
         assert road.finished_cars[11].lane_switches == 0
+        
+        
+def test_car_run():
+    car = Car(0, 0, 10)
+    car.speed = 5
+    car.run()
+    assert car.position == 5
+    
+    
+def test_car_accelerate():
+    car = Car(0, 0, 10)
+    car.speed = 5
+    car.acceleration = 1
+    car.accelerate()
+    assert car.speed == 6
+    
+    car.acceleration = 5
+    car.accelerate()
+    assert car.speed == 11
+    
+    car.accelerate()
+    assert car.speed == 11
+    
+    
+def test_switch_lane():
+    car = Car(0, 0, 10)
+    car.lane_switches = 4
+    car.switch_lane(8)
+    
+    assert car.lane_switches == 5
+    assert car.lane == 8
+    
+    
+def test_is_lane_available():
+    lane = [Car(0, 100, 10), Car(0, 130, 10)]
+    car = Car(1, 115, 10)
+    car.margin = 10
+    assert car.is_lane_available(lane) == True
+    
+    lane = [Car(0, 100, 10), Car(0, 120, 10)]
+    assert car.is_lane_available(lane) == False
+    
+    lane = [Car(0, 106, 10), Car(0, 130, 10)]
+    assert car.is_lane_available(lane) == False
+    
+    
+def test_is_eligible_to_switch_lane():
+    car = Car(0, 200, 10)
+    car.speed = 6
+    car.patience = 11
+    car.switch_lane(1)
+    car.run()
+    assert car.is_eligible_to_switch_lane() == False
+    car.run()
+    assert car.is_eligible_to_switch_lane() == True
+    car.patience = 12
+    assert car.is_eligible_to_switch_lane() == False
+    
+    
+def test_is_front_car_far():
+    car = Car(0, 200, 10)
+    car.speed = 10
+    front_car = Car(0, 210, 10)
+    assert car.is_front_car_far(front_car) == False
+    front_car = Car(0, 211, 10)
+    assert car.is_front_car_far(front_car) == True
+    
+    
+def run_test(f):
+    global success
+    try:
+        f()
+    except AssertionError:
+        print('[FAIL] %s has failed.' % f.__name__)
+        traceback.print_exc()
+        success = False
+    print('[PASS] %s has finished successfully.' % f.__name__)
+    
+        
+def testall():
+    testfunctions = [obj for name,obj in inspect.getmembers(sys.modules[__name__]) 
+                     if (inspect.isfunction(obj) and name.startswith('test_'))]
+    for f in testfunctions:
+        run_test(f)
+    
+    
+if __name__ == '__main__':
+    testall()
+    if success:
+        print('[SUCCESS] All tests have finished successfully.')
+    else:
+        print('[FAILURE] Some tests have failed.')

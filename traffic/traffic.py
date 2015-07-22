@@ -3,19 +3,19 @@ from bisect import bisect_right
 
 class Car(object):
     def __init__(self, lane, position, base_speed):
-        self.lane = lane
-        self.position = position
-        self.base_speed = base_speed
+        self.lane = lane                    # the lane's number. 0 - the rightmost
+        self.position = position            # position on the road, lengthwise
+        self.base_speed = base_speed        # the car's top speed
         
-        self.speed = 0
-        self.acceleration = 1
-        self.margin = 10
-        self.last_lane_switch = 0
-        self.patience = 100
+        self.speed = 0                      # the car's current speed
+        self.acceleration = 1               # the car's top acceleration value
+        self.margin = 10                    # margin kept from other cars when changing lanes
+        self.last_lane_switch = 0           # keeps the position where the last lane switch occurred - for patience
+        self.patience = 100                 # distance traveled before searching for other lanes
         
-        self.finish_time = -1
-        self.lane_switches = 0
-        self.finished = False
+        self.finish_time = -1               # time of finishing the road - set at the end of the road
+        self.lane_switches = 0              # counts the number of lane switches
+        self.finished = False               # designates whether the car has finished the road
         
         
     def run(self):
@@ -30,6 +30,7 @@ class Car(object):
     def switch_lane(self, lane):
         self.lane = lane
         self.lane_switches += 1
+        self.last_lane_switch = self.position
         
     
     def get_report(self):
@@ -45,36 +46,34 @@ class Car(object):
         keys = [car.position for car in lane]
         lane_back_car_index = bisect_right(keys, self.position)
         lane_front_car_index = lane_back_car_index + 1
-        if lane_back_car_index == 0:
-            lane_back_car = None
-        else:
-            lane_back_car = lane[lane_back_car_index-1]
-            
-        if lane_front_car_index > len(lane):
-            lane_front_car = None
-        else:
-            lane_front_car = lane[lane_front_car_index-1]
-            
-        if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin) and (self.position - self.last_lane_switch > self.patience):
+        
+        lane_back_car = None if lane_back_car_index == 0 else lane[lane_back_car_index-1]
+        lane_front_car = None if lane_front_car_index > len(lane) else lane[lane_front_car_index-1]
+        
+        if (lane_back_car is None or lane_back_car.position + lane_back_car.speed <= self.position + self.speed - self.margin) and (lane_front_car is None or lane_front_car.position + lane_front_car.speed >= self.position + self.speed + self.margin):
             return True
+        return False
+            
+            
+    def is_eligible_to_switch_lane(self):
+        return self.position - self.last_lane_switch > self.patience
             
             
     def is_front_car_far(self, front_car):
         if front_car is None or front_car.position > self.position + self.speed:
             return True
+        return False
     
         
     def drive(self, front_car, back_car, right_lane, left_lane):
         if self.is_front_car_far(front_car):
             self.run()
             self.accelerate()
-            if self.is_lane_available(right_lane):
+            if self.is_lane_available(right_lane) and self.is_eligible_to_switch_lane():
                 self.switch_lane(self.lane - 1)
-                self.last_lane_switch = self.position
         else:
-            if self.is_lane_available(left_lane):
+            if self.is_lane_available(left_lane) and self.is_eligible_to_switch_lane():
                 self.switch_lane(self.lane + 1)
-                self.last_lane_switch = self.position
                 
                 self.run()
                 self.accelerate()
