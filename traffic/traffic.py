@@ -32,6 +32,22 @@ class Car(object):
         self.lane_switches += 1
         self.last_lane_switch = self.position
         
+        
+    def move_to_right_lane(self, cur_lane, right_lane):
+        self.lane -= 1
+        self.lane_switches += 1
+        self.last_lane_switch = self.position
+        right_lane.append(self)
+        cur_lane.remove(self)
+        
+        
+    def move_to_left_lane(self, cur_lane, left_lane):
+        self.lane += 1
+        self.lane_switches += 1
+        self.last_lane_switch = self.position
+        left_lane.append(self)
+        cur_lane.remove(self)
+        
     
     def get_report(self):
         if self.finished:
@@ -65,15 +81,17 @@ class Car(object):
         return False
     
         
-    def drive(self, front_car, back_car, right_lane, left_lane):
+    def drive(self, front_car, back_car, right_lane, left_lane, cur_lane):
         if self.is_front_car_far(front_car):
             self.run()
             self.accelerate()
             if self.is_lane_available(right_lane) and self.is_eligible_to_switch_lane():
-                self.switch_lane(self.lane - 1)
+                #self.switch_lane(self.lane - 1)
+                self.move_to_right_lane(cur_lane, right_lane)
         else:
             if self.is_lane_available(left_lane) and self.is_eligible_to_switch_lane():
-                self.switch_lane(self.lane + 1)
+                #self.switch_lane(self.lane + 1)
+                self.move_to_left_lane(cur_lane, left_lane)
                 
                 self.run()
                 self.accelerate()
@@ -158,21 +176,20 @@ class Road(object):
         self.clock += 1
         
         self.lanes = self.split_cars_to_lanes(self.lanes_number, self.cars)
+        
+        for cur_car in self.cars:
+            cur_lane_num = cur_car.lane
+            right_lane = self.get_right_lane(self.lanes, cur_lane_num)
+            left_lane = self.get_left_lane(self.lanes, cur_lane_num)
+            cur_lane = self.lanes[cur_lane_num]
             
-        for j in range(self.lanes_number):
-            right_lane = self.get_right_lane(self.lanes, j)
-            left_lane = self.get_left_lane(self.lanes, j)
+            i = cur_lane.index(cur_car)
+            front_car = self.get_front_car(cur_lane, i)
+            back_car = self.get_back_car(cur_lane, i)
             
-            cur_lane = self.lanes[j]
-                
-            for i in range(len(cur_lane)):
-                cur_car = cur_lane[i]
-                front_car = self.get_front_car(cur_lane, i)
-                back_car = self.get_back_car(cur_lane, i)
-                
-                cur_car.drive(front_car, back_car, right_lane, left_lane)
-                if cur_car.position > self.length:
-                    self.checkout_car(cur_car, cur_lane)
+            cur_car.drive(front_car, back_car, right_lane, left_lane, cur_lane)
+            if cur_car.position > self.length:
+                self.checkout_car(cur_car, cur_lane)
                     
         self.cars = self.join_cars_from_lanes(self.lanes)
                 
@@ -218,5 +235,5 @@ def run_animation(animate=True):
     print(road.get_report())
         
 if __name__ == '__main__':
-    run_animation(animate=False)
+    run_animation(animate=True)
     
