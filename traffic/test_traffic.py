@@ -201,6 +201,52 @@ def test_road_join_cars_from_lanes():
     assert cars[2].position == 44
     
     
+def test_road_get_right_lane():
+    road = Road(2, 1000)
+    lanes = [[Car(0, 42, 10), Car(0, 44, 10)], [Car(1, 43, 10)]]
+    lane = road.get_right_lane(lanes, 1)
+    assert lane[0].position == 42
+    lane = road.get_right_lane(lanes, 0)
+    assert lane is None
+    
+    
+def test_road_get_left_lane():
+    road = Road(2, 1000)
+    lanes = [[Car(0, 42, 10), Car(0, 44, 10)], [Car(1, 43, 10)]]
+    lane = road.get_left_lane(lanes, 0)
+    assert lane[0].position == 43
+    lane = road.get_left_lane(lanes, 1)
+    assert lane is None
+    
+    
+def test_road_get_front_car():
+    road = Road(2, 1000)
+    lane = [Car(0, 42, 10), Car(0, 43, 10), Car(0, 44, 10)]
+    car = road.get_front_car(lane, 1)
+    assert car.position == 44
+    car = road.get_front_car(lane, 2)
+    assert car is None
+    
+    
+def test_road_get_back_car():
+    road = Road(2, 1000)
+    lane = [Car(0, 42, 10), Car(0, 43, 10), Car(0, 44, 10)]
+    car = road.get_back_car(lane, 1)
+    assert car.position == 42
+    car = road.get_back_car(lane, 0)
+    assert car is None
+    
+    
+def test_road_checkout_car():
+    road = Road(2, 1000)
+    fin_car = Car(0, 1001, 10)
+    lane = [Car(0, 42, 10), Car(0, 43, 10), Car(0, 44, 10), fin_car]
+    road.checkout_car(fin_car, lane)
+    assert fin_car.finished == True
+    assert fin_car not in lane
+    assert fin_car in road.finished_cars
+    
+    
 def test_road_step():
     pass
     
