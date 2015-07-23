@@ -113,36 +113,68 @@ class Road(object):
             
         return ret
         
+    
+    def split_cars_to_lanes(self, lanes_number, cars):
+        lanes = [[] for _ in range(lanes_number)]
+        for i in range(lanes_number):
+            lanes[i] = [car for car in cars if car.lane == i]
+        return lanes
+        
+        
+    def join_cars_from_lanes(self, lanes):
+        cars = [car for lane in lanes for car in lane]
+        cars.sort(key=lambda car: car.position, reverse=False)
+        return cars
+        
+        
+    def get_right_lane(self, lanes, i):
+        lane = None if i == 0 else lanes[i-1]
+        return lane
+        
+    
+    def get_left_lane(self, lanes, i):
+        lane = None if i == len(lanes)-1 else lanes[i+1]
+        return lane
+        
+        
+    def get_front_car(self, lane, i):
+        car = None if i == len(lane)-1 else lane[i+1]
+        return car
+        
+        
+    def get_back_car(self, lane, i):
+        car = None if i == 0 else lane[i-1]
+        return car
+        
+        
+    def checkout_car(self, car, lane):
+        car.finish_time = self.clock
+        car.finished = True
+        lane.remove(car)
+        self.finished_cars.append(car)
+    
+        
     def step(self):
         self.clock += 1
         
-        self.lanes = [[] for _ in range(self.lanes_number)]
-        for i in range(self.lanes_number):
-            self.lanes[i] = [car for car in self.cars if car.lane == i]
+        self.lanes = self.split_cars_to_lanes(self.lanes_number, self.cars)
             
         for j in range(self.lanes_number):
-            for i in range(len(self.lanes[j])):
-                front_car = None
-                back_car = None
-                if i != 0:
-                    back_car = self.lanes[j][i-1]
-                if i != len(self.lanes[j])-1:
-                    front_car = self.lanes[j][i+1]
-                    
-                right_lane = None
-                left_lane = None
-                if j != 0:
-                    right_lane = self.lanes[j-1]
-                if j != len(self.lanes)-1:
-                    left_lane = self.lanes[j+1]
-                self.lanes[j][i].drive(front_car, back_car, right_lane, left_lane)
-                if self.lanes[j][i].position > self.length:
-                    self.lanes[j][i].finish_time = self.clock
-                    self.lanes[j][i].finished = True
-                    self.finished_cars.append(self.lanes[j].pop(i))
+            right_lane = self.get_right_lane(self.lanes, j)
+            left_lane = self.get_left_lane(self.lanes, j)
+            
+            cur_lane = self.lanes[j]
                 
-        self.cars = [car for lane in self.lanes for car in lane]
-        self.cars.sort(key=lambda car: car.position, reverse=False)
+            for i in range(len(cur_lane)):
+                cur_car = cur_lane[i]
+                front_car = self.get_front_car(cur_lane, i)
+                back_car = self.get_back_car(cur_lane, i)
+                
+                cur_car.drive(front_car, back_car, right_lane, left_lane)
+                if cur_car.position > self.length:
+                    self.checkout_car(cur_car, cur_lane)
+                    
+        self.cars = self.join_cars_from_lanes(self.lanes)
                 
         
         

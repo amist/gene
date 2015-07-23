@@ -7,7 +7,7 @@ from traffic import Road
 success = True
 
 
-def test_run_acceptance_test():
+def test_road_acceptance_test():
     road_length = 1000
     lanes_number = 2
     road = Road(lanes_number, road_length)
@@ -83,7 +83,7 @@ def test_car_accelerate():
     assert car.speed == 11
     
     
-def test_switch_lane():
+def test_car_switch_lane():
     car = Car(0, 0, 10)
     car.lane_switches = 4
     car.switch_lane(8)
@@ -92,7 +92,7 @@ def test_switch_lane():
     assert car.lane == 8
     
     
-def test_is_lane_available():
+def test_car_is_lane_available():
     lane = [Car(0, 100, 10), Car(0, 130, 10)]
     car = Car(1, 115, 10)
     car.margin = 10
@@ -105,7 +105,7 @@ def test_is_lane_available():
     assert car.is_lane_available(lane) == False
     
     
-def test_is_eligible_to_switch_lane():
+def test_car_is_eligible_to_switch_lane():
     car = Car(0, 200, 10)
     car.speed = 6
     car.patience = 11
@@ -118,13 +118,91 @@ def test_is_eligible_to_switch_lane():
     assert car.is_eligible_to_switch_lane() == False
     
     
-def test_is_front_car_far():
+def test_car_is_front_car_far():
     car = Car(0, 200, 10)
     car.speed = 10
     front_car = Car(0, 210, 10)
     assert car.is_front_car_far(front_car) == False
     front_car = Car(0, 211, 10)
     assert car.is_front_car_far(front_car) == True
+    
+    
+def test_car_drive_no_lanes():
+    car = Car(0, 200, 10)
+    car.speed = 10
+    front_car = Car(0, 220, 10)
+    car.drive(front_car, None, None, None)
+    assert car.position == 210
+    car.drive(front_car, None, None, None)
+    assert car.position == 210
+    
+    
+def test_car_drive_blocked():
+    car = Car(0, 200, 10)
+    car.speed = 10
+    front_car = Car(0, 201, 10)
+    car.drive(front_car, None, None, None)
+    assert car.position == 200
+    
+    
+def test_car_drive_and_bypass():
+    car = Car(0, 200, 10)
+    car.speed = 10
+    front_car = Car(0, 205, 10)
+    car.drive(front_car, None, None, [])
+    assert car.lane == 1
+    assert car.position == 210
+    
+    
+def test_car_drive_back_to_right_lane():
+    car = Car(1, 200, 10)
+    car.speed = 10
+    car.last_lane_switch = 190
+    car.patience = 25
+    car.drive(None, None, [], None)
+    assert car.lane == 1
+    car.drive(None, None, [], None)
+    assert car.lane == 0
+    
+    
+def test_road_add_car():
+    road = Road(2, 1000)
+    road.add_car(Car(0, 42, 10))
+    road.add_car(Car(0, 84, 10))
+    assert road.cars[0].position == 42
+    assert len(road.cars) == 2
+    
+    
+def test_road_is_empty():
+    road = Road(2, 1000)
+    assert road.is_empty()
+    road.add_car(Car(0, 42, 10))
+    assert not road.is_empty()
+    
+    
+def test_road_split_cars_to_lanes():
+    road = Road(2, 1000)
+    cars = [Car(0, 42, 10), Car(1, 43, 10), Car(0, 44, 10)]
+    lanes = road.split_cars_to_lanes(2, cars)
+    assert lanes[0][0].position == 42
+    assert lanes[0][1].position == 44
+    assert lanes[1][0].position == 43
+    
+    
+def test_road_join_cars_from_lanes():
+    road = Road(2, 1000)
+    lanes = [[Car(0, 42, 10), Car(0, 44, 10)], [Car(1, 43, 10)]]
+    cars = road.join_cars_from_lanes(lanes)
+    assert cars[0].lane == 0
+    assert cars[1].lane == 1
+    assert cars[2].lane == 0
+    assert cars[0].position == 42
+    assert cars[1].position == 43
+    assert cars[2].position == 44
+    
+    
+def test_road_step():
+    pass
     
     
 def run_test(f):
