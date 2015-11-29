@@ -102,9 +102,9 @@ class GeneticExecutor:
             population.add_individual(plan)
         
         for i in range(self.max_generations_number):
-            print 'Processing generation %d' % i
+            print('Processing generation %d' % i)
             population.process_generation()
-            print '  Current maximum fitness value = %d' % population.population[0].get_fitness_value()
+            print('  Current maximum fitness value = %d' % population.population[0].get_fitness_value())
             if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
                 break;
         return population.population[0]
