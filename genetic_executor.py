@@ -1,4 +1,4 @@
-#from random import randint
+# from random import randint
 import random
 import copy
 import multiprocessing
@@ -49,18 +49,28 @@ class Population:
     def add_individual(self, individual):
         self.population.append(individual)
         
-    def process_generation(self):
+    def process_generation(self, with_fights):
+        if with_fights:
+            self._simulate_fights()
         self._expand_population()
 #         self._calculate_fintesses()
         self._sort_population()
         #self._distinct_population()
         self._cut_population()
-        #self.population[0].print_plan()
+        self.population[0].print_plan()
+        
+    def _simulate_fights(self):
+        for individual in self.population:
+            individual.reset_state()
+        for _ in range(20*self.size):
+            contestant_1 = self._get_individual_with_uniform_choice()
+            contestant_2 = self._get_individual_with_uniform_choice()
+            contestant_1.fight(contestant_2)
         
     def _expand_population(self):
         for _ in range(self.size * (self.expansion_factor - 1)):
-            self.population.append(self._get_individual_with_uniform_choice().get_child(self._get_individual_with_uniform_choice()))
-            #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
+            #self.population.append(self._get_individual_with_uniform_choice().get_child(self._get_individual_with_uniform_choice()))
+            self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         
     def _sort_population(self):
         self.population.sort(key=lambda x: -x.get_fitness_value())
@@ -89,10 +99,11 @@ class Plan:
 
 class GeneticExecutor:
 
-    def __init__(self, individual_instance, initial_population_size = 10, max_generations_number = 100):
+    def __init__(self, individual_instance, initial_population_size = 10, max_generations_number = 100, simulate_fights = False):
         self.individual_instance = copy.deepcopy(individual_instance)
         self.initial_population_size = initial_population_size
         self.max_generations_number = max_generations_number
+        self.simulate_fights = simulate_fights
         
     def get_solution(self):
         population = Population()
@@ -102,9 +113,9 @@ class GeneticExecutor:
             population.add_individual(plan)
         
         for i in range(self.max_generations_number):
-            print 'Processing generation %d' % i
-            population.process_generation()
-            print '  Current maximum fitness value = %d' % population.population[0].get_fitness_value()
+            print('Processing generation %d' % i)
+            population.process_generation(self.simulate_fights)
+            print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
             if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
-                break;
+                break
         return population.population[0]
