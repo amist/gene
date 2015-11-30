@@ -6,6 +6,8 @@ class QueensPlan(Plan):
     def __init__(self, size = 8, chromosome = None):
         if (chromosome is None):
             self.chromosome = []
+        else:
+            self.chromosome = chromosome
         self.size = size
         self._fitness = None
         
