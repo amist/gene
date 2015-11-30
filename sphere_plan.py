@@ -36,7 +36,8 @@ class SpherePlan(Plan):
     def get_fitness_value(self):
         if self._fitness is not None:
             return self._fitness
-        return -sum([x*x for x in self.chromosome])
+        self._fitness = -sum([x*x for x in self.chromosome])
+        return self._fitness
         
         
     def print_plan(self):
