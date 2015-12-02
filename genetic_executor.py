@@ -4,13 +4,25 @@ import copy
 import multiprocessing
 
 class Population:
-    def __init__(self, size = 200, expansion_factor = 5):
+    def __init__(self, size=200, expansion_factor=5, genders='no'):
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
+        self.genders = genders
+        self.coindividuals_num = 100
         
     def _get_individual_with_uniform_choice(self):
         return self.population[random.randint(0, len(self.population) - 1)]
+        
+    def _get_coindividual_with_uniform_choice(self, parent1):
+        parent2 = None
+        max_fitness = None
+        for _ in range(self.coindividuals_num):
+            other = self.population[random.randint(0, len(self.population) - 1)]
+            if max_fitness is None or max_fitness < parent1.get_cofitness_value(other):
+                parent2 = other
+                max_fitness = parent1.get_cofitness_value(other)
+        return parent2
         
     def _get_individual_with_weighted_choice(self):
         choices = self.population
@@ -58,9 +70,19 @@ class Population:
         #self.population[0].print_plan()
         
     def _expand_population(self):
-        for _ in range(self.size * (self.expansion_factor - 1)):
-            self.population.append(self._get_individual_with_uniform_choice().get_child(self._get_individual_with_uniform_choice()))
-            #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
+        if self.genders == 'no':
+            for _ in range(self.size * (self.expansion_factor - 1)):
+                parent1 = self._get_individual_with_uniform_choice()
+                parent2 = self._get_individual_with_uniform_choice()
+                child = parent1.get_child(parent2)
+                self.population.append(child)
+                #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
+        if self.genders == 'equals':
+            for _ in range(self.size * (self.expansion_factor - 1)):
+                parent1 = self._get_individual_with_uniform_choice()
+                parent2 = self._get_coindividual_with_uniform_choice(parent1)
+                child = parent1.get_child(parent2)
+                self.population.append(child)
         
     def _sort_population(self):
         self.population.sort(key=lambda x: -x.get_fitness_value())
@@ -89,13 +111,14 @@ class Plan:
 
 class GeneticExecutor:
 
-    def __init__(self, individual_instance, initial_population_size = 10, max_generations_number = 100):
+    def __init__(self, individual_instance, initial_population_size=10, max_generations_number=100, genders='no'):
         self.individual_instance = copy.deepcopy(individual_instance)
         self.initial_population_size = initial_population_size
         self.max_generations_number = max_generations_number
+        self.genders = genders
         
     def get_solution(self):
-        population = Population()
+        population = Population(genders=self.genders)
         for i in range(self.initial_population_size):
             plan = copy.deepcopy(self.individual_instance)
             plan.chromosome = plan.get_random_chromosome()
