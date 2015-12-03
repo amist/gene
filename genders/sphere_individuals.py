@@ -41,7 +41,9 @@ class SphereIndividual(Individual):
     def get_fitness_value(self):
         if self._fitness is not None:
             return self._fitness
-        self._fitness = -sum([x*x for x in self.data_chromosome])
+        #self._fitness = -sum([x*x for x in self.data_chromosome])   # optimal at [0, 0, 0, ...]
+        #self._fitness = -sum([(1-x)*(1-x) for x in self.data_chromosome])   # optimal at [1, 1, 1, ...]
+        self._fitness = -sum([(2-x)*(2-x) for x in self.data_chromosome])   # optimal at [2, 2, 2, ...]
         return self._fitness
         
         
@@ -55,7 +57,11 @@ class SphereIndividualA(SphereIndividual):
         
         
     def get_heuristic_value(self, candidate):
-        return 0
+        estimated_data = []
+        for i in range(self.size):
+            f = self._operators[self.operator_chromosome[i]]
+            estimated_data.append(f(self.data_chromosome[i], candidate.data_chromosome[i]))
+        return -sum([(2-x)*(2-x) for x in estimated_data])   # optimal at [2, 2, 2, ...]
 
 
 class SphereIndividualB(SphereIndividual):
@@ -107,3 +113,4 @@ if __name__ == '__main__':
     ge = GeneticExecutor(sia, sib, initial_population_size = 10, max_generations_number = 100)
     solution = ge.get_solution()
     solution.print_solution()
+    print(solution.get_fitness_value())
