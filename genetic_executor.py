@@ -14,6 +14,13 @@ class Population:
     def _get_individual_with_uniform_choice(self):
         return self.population[random.randint(0, len(self.population) - 1)]
         
+    def _get_individual_with_moving_window(self, percentage):
+        window_size = self.size / 10
+        lb = int(percentage * (self.size - window_size))
+        ub = int(window_size + percentage * (self.size - window_size - 1))
+        #print(percentage, lb, ub)
+        return self.population[random.randint(lb, ub - 1)]
+        
     def _get_coindividual_with_uniform_choice(self, parent1):
         parent2 = None
         max_fitness = None
@@ -70,10 +77,13 @@ class Population:
         #self.population[0].print_plan()
         
     def _expand_population(self):
+        #print("========================")
         if self.genders == 'no':
-            for _ in range(self.size * (self.expansion_factor - 1)):
-                parent1 = self._get_individual_with_uniform_choice()
-                parent2 = self._get_individual_with_uniform_choice()
+            for iter_num in range(self.size * (self.expansion_factor - 1)):
+                #parent1 = self._get_individual_with_uniform_choice()
+                #parent2 = self._get_individual_with_uniform_choice()
+                parent1 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
+                parent2 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
                 child = parent1.get_child(parent2)
                 self.population.append(child)
                 #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
@@ -111,15 +121,15 @@ class Plan:
 
 class GeneticExecutor:
 
-    def __init__(self, individual_instance, initial_population_size=10, max_generations_number=100, genders='no'):
+    def __init__(self, individual_instance, population_size=200, max_generations_number=100, genders='no'):
         self.individual_instance = copy.deepcopy(individual_instance)
-        self.initial_population_size = initial_population_size
+        self.population_size = population_size
         self.max_generations_number = max_generations_number
         self.genders = genders
         
     def get_solution(self):
-        population = Population(genders=self.genders)
-        for i in range(self.initial_population_size):
+        population = Population(genders=self.genders, size=self.population_size)
+        for i in range(self.population_size):
             plan = copy.deepcopy(self.individual_instance)
             plan.chromosome = plan.get_random_chromosome()
             population.add_individual(plan)
