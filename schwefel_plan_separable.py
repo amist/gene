@@ -1,3 +1,4 @@
+import sys
 import random
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
@@ -68,7 +69,15 @@ class SchwefelPlanSeparable(Plan):
         
         
 if __name__ == '__main__':
-    sp = SchwefelPlanSeparable(10)
-    ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100)
-    solution = ge.get_solution()
-    solution.print_plan()
+    iterations_num = 1
+    debug = True
+    if len(sys.argv) > 1:
+        iterations_num = int(sys.argv[1])
+        debug = False
+        
+    for _ in range(iterations_num):
+        sp = SchwefelPlanSeparable(10)
+        ge = GeneticExecutor(sp, population_size=200, max_generations_number=100, debug=debug)
+        solution = ge.get_solution()
+        print(solution.get_fitness_value())
+        
