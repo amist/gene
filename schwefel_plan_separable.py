@@ -15,7 +15,7 @@ class SchwefelPlanSeparable(Plan):
         
         
     def get_chromosome_size(self):
-        return int(self.size * (self.size + 1) / 2)
+        return self.size
         
         
     def get_random_chromosome(self):
@@ -37,27 +37,33 @@ class SchwefelPlanSeparable(Plan):
         return child
         
         
-    def get_solution(self):
-        solution = self.size * [0]
-        k = 0
-        for i in range(self.size):
-            for j in range(i+1):
-                solution[j] += self.chromosome[k]
-                k += 1
+    def get_solution_vector(self):
+        # the solution vector is:   x_1, x_2, x_3, ...
+        # the chromosome is:        y_1, y_2, y_3, ...
+        # where:                    y_1 = x_1
+        #                           y_2 = x_1 + x_2
+        #                           y_3 = x_1 + x_2 + x_3
+        # so:                       x_1 = y_1
+        #                           x_2 = y_2 - y_1
+        #                           x_3 = y_3 - y_2
+        # the inseparable Schwefel's double sum transform into a separable isomorphic problem
+        solution = [self.chromosome[0]]
+        for i in range(self.get_chromosome_size() - 1):
+            solution.append(self.chromosome[i+1] - self.chromosome[i])
         return solution
         
         
     def get_fitness_value(self):
         if self._fitness is not None:
             return self._fitness
-        solution = self.get_solution()
+        solution = self.get_solution_vector()
         self._fitness = -sum([(sum([solution[j] for j in range(i+1)]))**2 for i in range(len(solution))])
         return self._fitness
         
         
     def print_plan(self):
         print(self.chromosome)
-        print(self.get_solution())
+        print(self.get_solution_vector())
             
         
         
