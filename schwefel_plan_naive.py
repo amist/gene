@@ -14,6 +14,7 @@ class SchwefelPlanNaive(Plan):
         
         self._mutation_probability = mutation_probability
         self._size_dependant_mutation_probability = size_dependant_mutation_probability
+        self._actual_mutation_probability = self._mutation_probability
         if self._size_dependant_mutation_probability:
             self._actual_mutation_probability = self.size * self._mutation_probability
         self._mutation_step_factor = mutation_step_factor
@@ -129,9 +130,9 @@ def run_algorithm():
     
     
 if __name__ == '__main__':
-    #find_algorithm_parameters()
+    find_algorithm_parameters()
     
-    run_algorithm()
+    #run_algorithm()
     
     
     
