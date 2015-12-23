@@ -1,5 +1,6 @@
 import sys
 import random
+import statistics
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
 
@@ -30,7 +31,9 @@ class SchwefelPlanNaive(Plan):
             
             # mutate
             if random.randint(1, 10 * self.size) == 1:
-                child.chromosome[i] = random.uniform(self._lower_bound, self._upper_bound)
+                rand_val = random.uniform(self._lower_bound, self._upper_bound)
+                rand_val = child.chromosome[i] + 0.01 * (rand_val - 0.5 * (self._lower_bound + self._upper_bound))
+                child.chromosome[i] = rand_val
         return child
         
         
@@ -46,7 +49,22 @@ class SchwefelPlanNaive(Plan):
         print(self.chromosome)
             
         
+    
+def run_iterations(iterations_num):
+    solutions = []
+
+    for _ in range(iterations_num):
+        sp = SchwefelPlanNaive(10)
+        ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=debug)
+        solution = ge.get_solution()
         
+        solutions.append(solution.get_fitness_value())
+        print(solution.get_fitness_value())
+        
+    print('==============================')
+    print('Mean: ' + str(statistics.mean(solutions)))
+    print('STD:  ' + str(statistics.stdev(solutions)))
+    
 if __name__ == '__main__':
     iterations_num = 1
     debug = True
@@ -54,9 +72,5 @@ if __name__ == '__main__':
         iterations_num = int(sys.argv[1])
         debug = False
         
-    for _ in range(iterations_num):
-        sp = SchwefelPlanNaive(10)
-        ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=debug)
-        solution = ge.get_solution()
-        print(solution.get_fitness_value())
+    run_iterations(iterations_num)
         
