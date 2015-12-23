@@ -15,7 +15,7 @@ class SchwefelPlanNaive(Plan):
         self._mutation_probability = mutation_probability
         self._size_dependant_mutation_probability = size_dependant_mutation_probability
         if self._size_dependant_mutation_probability:
-            self._mutation_probability = self.size * self._mutation_probability
+            self._actual_mutation_probability = self.size * self._mutation_probability
         self._mutation_step_factor = mutation_step_factor
         
         
@@ -33,7 +33,8 @@ class SchwefelPlanNaive(Plan):
             child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
             
             # mutate
-            if random.randint(1, self._mutation_probability) == 1:
+            #print(self._actual_mutation_probability)
+            if random.randint(0, int(self._actual_mutation_probability)) == 0:
                 rand_val = random.uniform(self._lower_bound, self._upper_bound)
                 rand_val = child.chromosome[i] + self._mutation_step_factor * (random.uniform(self._lower_bound, self._upper_bound) - 0.5 * (self._lower_bound + self._upper_bound))
                 child.chromosome[i] = rand_val
@@ -53,7 +54,7 @@ class SchwefelPlanNaive(Plan):
             
         
     
-def run_iterations():
+def run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True):
     iterations_num = 1
     debug = True
     if len(sys.argv) > 1:
@@ -63,24 +64,78 @@ def run_iterations():
     solutions = []
 
     for _ in range(iterations_num):
-        sp = SchwefelPlanNaive(10)
-        ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=debug)
+        sp = SchwefelPlanNaive(size=10, mutation_probability=mutation_probability, size_dependant_mutation_probability=size_dependant_mutation_probability, mutation_step_factor=mutation_step_factor)
+        ge = GeneticExecutor(sp, population_size=population_size, max_generations_number=max_generations_number, debug=debug)
         solution = ge.get_solution()
         
         solutions.append(solution.get_fitness_value())
-        print(solution.get_fitness_value())
+        if log:
+            print(solution.get_fitness_value())
+        
+    if len(solutions) == 1:
+        return [solutions[0], 0]
     
     return [statistics.mean(solutions), statistics.stdev(solutions)]
     
     
-if __name__ == '__main__':
+class ArgsPlan(Plan):
+    def __init__(self):
+        self.chromosome = []
     
+    
+    def get_random_chromosome(self):
+        # [mutation prbability, size dependant mutation probability, mutation step factor]
+        return [random.randint(2, 100), True if random.randint(0,1) == 0 else False, random.uniform(0,1)]
         
-    [mean, std] = run_iterations()
+        
+    def get_child(self, parent2):
+        child = ArgsPlan()
+        for i in range(3):
+            # crossover
+            child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
+            
+            # mutate
+            if random.randint(1, 10 * 3) == 1:
+                if i == 0:
+                    rand_val = child.chromosome[i] + int(0.1 * (random.randint(2, 100) - 0.5 * (2 + 100)))
+                if i == 1:
+                    rand_val = True if random.randint(0,1) == 0 else False
+                else:
+                    rand_val = child.chromosome[i] + 0.1 * (random.uniform(0, 1) - 0.5)
+                child.chromosome[i] = rand_val
+        return child
+        
+        
+    def get_fitness_value(self):
+        [mean, std] = run_iterations(population_size=10, max_generations_number=100, mutation_probability=self.chromosome[0], size_dependant_mutation_probability=self.chromosome[1], mutation_step_factor=self.chromosome[2], log=False)
+        return mean
+        
+        
+def find_algorithm_parameters():
+    # usage: pypy schwefel_plan_naive.py 2
+    ap = ArgsPlan()
+    ge = GeneticExecutor(ap, population_size=10, max_generations_number=100)
+    solution = ge.get_solution()
+    
+    
+def run_algorithm():
+
+    [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)
+    #[mean, std] = run_iterations(46, False, 0.17660495879064186)
     
     print('==============================')
     print('Mean: ' + str(mean))
     print('STD:  ' + str(std))
+    
+    
+if __name__ == '__main__':
+    #find_algorithm_parameters()
+    
+    run_algorithm()
+    
+    
+    
+    
     
     
     

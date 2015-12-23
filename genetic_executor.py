@@ -121,7 +121,7 @@ class Plan:
 
 class GeneticExecutor:
 
-    def __init__(self, individual_instance, population_size=200, max_generations_number=100, genders='no', debug='false'):
+    def __init__(self, individual_instance, population_size=200, max_generations_number=100, genders='no', debug=False):
         self.individual_instance = copy.deepcopy(individual_instance)
         self.population_size = population_size
         self.max_generations_number = max_generations_number
@@ -141,6 +141,7 @@ class GeneticExecutor:
             population.process_generation()
             if self.debug == True:
                 print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
+                print('  Current optimal solution: ' + str(population.population[0].chromosome))
             if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
                 break;
         if self.debug == True:
