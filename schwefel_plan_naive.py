@@ -108,21 +108,22 @@ class ArgsPlan(Plan):
         
         
     def get_fitness_value(self):
-        [mean, std] = run_iterations(population_size=10, max_generations_number=100, mutation_probability=self.chromosome[0], size_dependant_mutation_probability=self.chromosome[1], mutation_step_factor=self.chromosome[2], log=False)
+        [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=self.chromosome[0], size_dependant_mutation_probability=self.chromosome[1], mutation_step_factor=self.chromosome[2], log=False)
         return mean
         
         
 def find_algorithm_parameters():
     # usage: pypy schwefel_plan_naive.py 2
     ap = ArgsPlan()
-    ge = GeneticExecutor(ap, population_size=10, max_generations_number=100)
+    ge = GeneticExecutor(ap, population_size=10, max_generations_number=1000, debug=True)
     solution = ge.get_solution()
     
     
 def run_algorithm():
 
-    [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)
-    #[mean, std] = run_iterations(46, False, 0.17660495879064186)
+    [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)   # current values
+    #[mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)
+    #[mean, std] = run_iterations(population_size=10, max_generations_number=100, mutation_probability=77, size_dependant_mutation_probability=True, mutation_step_factor=0.5783122322124005, log=True)
     
     print('==============================')
     print('Mean: ' + str(mean))
@@ -130,9 +131,10 @@ def run_algorithm():
     
     
 if __name__ == '__main__':
-    find_algorithm_parameters()
     
-    #run_algorithm()
+    #find_algorithm_parameters()
+    
+    run_algorithm()
     
     
     
