@@ -47,6 +47,6 @@ class SpherePlan(Plan):
         
 if __name__ == '__main__':
     sp = SpherePlan(10)
-    ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100)
+    ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=True)
     solution = ge.get_solution()
     solution.print_plan()
