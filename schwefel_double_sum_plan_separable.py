@@ -4,7 +4,7 @@ import statistics
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
 
-class SchwefelPlanSeparable(Plan):
+class SchwefelDoubleSumPlanSeparable(Plan):
     def __init__(self, size = 10, chromosome = None):
         if (chromosome is None):
             self.chromosome = []
@@ -28,7 +28,7 @@ class SchwefelPlanSeparable(Plan):
             
             
     def get_child(self, parent2):
-        child = SchwefelPlanSeparable(self.size)
+        child = SchwefelDoubleSumPlanSeparable(self.size)
         for i in range(self.get_chromosome_size()):
             # crossover
             child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
@@ -74,7 +74,7 @@ def run_iterations(iterations_num):
     solutions = []
 
     for _ in range(iterations_num):
-        sp = SchwefelPlanSeparable(10)
+        sp = SchwefelDoubleSumPlanSeparable(10)
         ge = GeneticExecutor(sp, population_size=200, max_generations_number=100, debug=debug)
         solution = ge.get_solution()
         

@@ -4,7 +4,7 @@ import statistics
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
 
-class SchwefelPlanNaive(Plan):
+class SchwefelDoubleSumPlanNaive(Plan):
     def __init__(self, size=10, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01):
         self.chromosome = []
         self.size = size
@@ -28,7 +28,7 @@ class SchwefelPlanNaive(Plan):
             
             
     def get_child(self, parent2):
-        child = SchwefelPlanNaive(self.size)
+        child = SchwefelDoubleSumPlanNaive(self.size)
         for i in range(self.size):
             # crossover
             child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
@@ -65,7 +65,7 @@ def run_iterations(population_size=200, max_generations_number=100, mutation_pro
     solutions = []
 
     for _ in range(iterations_num):
-        sp = SchwefelPlanNaive(size=10, mutation_probability=mutation_probability, size_dependant_mutation_probability=size_dependant_mutation_probability, mutation_step_factor=mutation_step_factor)
+        sp = SchwefelDoubleSumPlanNaive(size=10, mutation_probability=mutation_probability, size_dependant_mutation_probability=size_dependant_mutation_probability, mutation_step_factor=mutation_step_factor)
         ge = GeneticExecutor(sp, population_size=population_size, max_generations_number=max_generations_number, debug=debug)
         solution = ge.get_solution()
         
@@ -113,7 +113,7 @@ class ArgsPlan(Plan):
         
         
 def find_algorithm_parameters():
-    # usage: pypy schwefel_plan_naive.py 2
+    # usage: pypy schwefel_double_sum_plan_naive.py 2
     ap = ArgsPlan()
     ge = GeneticExecutor(ap, population_size=10, max_generations_number=1000, debug=True)
     solution = ge.get_solution()
@@ -121,9 +121,9 @@ def find_algorithm_parameters():
     
 def run_algorithm():
 
-    [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)   # current values
-    #[mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)
-    #[mean, std] = run_iterations(population_size=10, max_generations_number=100, mutation_probability=77, size_dependant_mutation_probability=True, mutation_step_factor=0.5783122322124005, log=True)
+    #[mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)      # original values
+    [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=61, size_dependant_mutation_probability=True, mutation_step_factor=0.8386711947606522, log=True)      # after 157 iterations of find_algorithm_parameters
+    #[mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=62, size_dependant_mutation_probability=False, mutation_step_factor=0.84, log=True)
     
     print('==============================')
     print('Mean: ' + str(mean))
