@@ -3,8 +3,8 @@ import statistics
 import random
 from deap import creator, base, tools, algorithms
 
-LOWER_BOUND = -5.12
-UPPER_BOUND = 5.12
+LOWER_BOUND = -2.048
+UPPER_BOUND = 2.048
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)

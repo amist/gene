@@ -9,8 +9,8 @@ class RosenbrockPlanNaive(Plan):
         self.chromosome = []
         self.size = size
         self._fitness = None
-        self._lower_bound = -65.536
-        self._upper_bound = 65.536
+        self._lower_bound = -2.048
+        self._upper_bound = 2.048
         
         self._mutation_probability = mutation_probability
         self._size_dependant_mutation_probability = size_dependant_mutation_probability
