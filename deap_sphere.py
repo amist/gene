@@ -20,7 +20,8 @@ def evalOneMin(individual):
     
 toolbox.register("evaluate", evalOneMin)
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
-toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.05)
+toolbox.register("mutate", tools.mutUniformInt, low=int(LOWER_BOUND), up=int(UPPER_BOUND), indpb=0.01)
+#toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.05)
 #toolbox.register("select", tools.selTournament, tournsize=3)
 
 toolbox.register("select", tools.selBest)
