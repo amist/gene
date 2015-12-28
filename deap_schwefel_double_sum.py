@@ -16,7 +16,7 @@ toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.att
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evalOneMin(individual):
-    return sum([s*s for s in individual]),
+    return sum([(sum([individual[j] for j in range(i+1)]))**2 for i in range(len(individual))]),
     
 toolbox.register("evaluate", evalOneMin)
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
