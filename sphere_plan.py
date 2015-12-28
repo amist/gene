@@ -48,7 +48,7 @@ class SpherePlan(Plan):
 def main():
     iterations_num = 1
     debug = True
-    solutions = []
+    results = []
     if len(sys.argv) > 1:
         iterations_num = int(sys.argv[1])
         debug = False
@@ -61,11 +61,11 @@ def main():
         if debug:
             solution.print_plan()
         print(solution.get_fitness_value())
-        solutions.append(solution.get_fitness_value())
+        results.append(solution.get_fitness_value())
         
-    [mean, std] = [solutions[0], 0]
-    if len(solutions) > 1:
-        [mean, std] = [statistics.mean(solutions), statistics.stdev(solutions)]
+    [mean, std] = [results[0], 0]
+    if len(results) > 1:
+        [mean, std] = [statistics.mean(results), statistics.stdev(results)]
         
     print('==============================')
     print('Mean: ' + str(mean))

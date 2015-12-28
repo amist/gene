@@ -57,21 +57,21 @@ class SchwefelDoubleSumPlanNaive(Plan):
         
     
 def run_iterations(genetic_executor, iterations_num, debug=True):
-    solutions = []
+    results = []
 
     for _ in range(iterations_num):
         
         ge = genetic_executor
         solution = ge.get_solution()
         
-        solutions.append(solution.get_fitness_value())
+        results.append(solution.get_fitness_value())
         if debug:
             print(solution.get_fitness_value())
         
-    if len(solutions) == 1:
-        return [solutions[0], 0]
+    if len(results) == 1:
+        return [results[0], 0]
     
-    return [statistics.mean(solutions), statistics.stdev(solutions)]
+    return [statistics.mean(results), statistics.stdev(results)]
     
         
 def find_algorithm_parameters():

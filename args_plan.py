@@ -44,7 +44,7 @@ class ArgsPlan(Plan):
             solution = ge.get_solution()
             results.append(solution.get_fitness_value())
             
-        print(results)
+        #print(results)
         return statistics.mean(results)
         
         

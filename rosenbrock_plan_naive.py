@@ -3,6 +3,7 @@ import random
 import statistics
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
+from args_plan import ArgsPlan
 
 class RosenbrockPlanNaive(Plan):
     def __init__(self, size=10, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01):
@@ -55,74 +56,49 @@ class RosenbrockPlanNaive(Plan):
             
         
     
-def run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True):
+def run_iterations(genetic_executor, iterations_num, debug=True):
+    results = []
+
+    for _ in range(iterations_num):
+        
+        ge = genetic_executor
+        solution = ge.get_solution()
+        
+        results.append(solution.get_fitness_value())
+        if debug:
+            print(solution.get_fitness_value())
+        
+    if len(results) == 1:
+        return [results[0], 0]
+    
+    return [statistics.mean(results), statistics.stdev(results)]
+    
+        
+def find_algorithm_parameters():
+    # usage: pypy schwefel_double_sum_plan_naive.py 2
+    # After 157 iterations:
+    # mutation_probability=61, size_dependant_mutation_probability=True, mutation_step_factor=0.8386711947606522
+    
+    sp = RosenbrockPlanNaive()
+    inner_ge = GeneticExecutor(sp, debug=False)
+    
+    ap = ArgsPlan(inner_ge)
+    ge = GeneticExecutor(ap, population_size=10, max_generations_number=1000, debug=True)
+    solution = ge.get_solution()
+    print(solution)
+    
+    
+def run_algorithm():
     iterations_num = 1
     debug = True
     if len(sys.argv) > 1:
         iterations_num = int(sys.argv[1])
         debug = False
         
-    solutions = []
-
-    for _ in range(iterations_num):
-        sp = RosenbrockPlanNaive(size=10, mutation_probability=mutation_probability, size_dependant_mutation_probability=size_dependant_mutation_probability, mutation_step_factor=mutation_step_factor)
-        ge = GeneticExecutor(sp, population_size=population_size, max_generations_number=max_generations_number, debug=debug)
-        solution = ge.get_solution()
-        
-        solutions.append(solution.get_fitness_value())
-        if log:
-            print(solution.get_fitness_value())
-        
-    if len(solutions) == 1:
-        return [solutions[0], 0]
+    sp = RosenbrockPlanNaive()
+    ge = GeneticExecutor(sp, debug=debug)
     
-    return [statistics.mean(solutions), statistics.stdev(solutions)]
-    
-    
-class ArgsPlan(Plan):
-    def __init__(self):
-        self.chromosome = []
-    
-    
-    def get_random_chromosome(self):
-        # [mutation prbability, size dependant mutation probability, mutation step factor]
-        return [random.randint(2, 100), True if random.randint(0,1) == 0 else False, random.uniform(0,1)]
-        
-        
-    def get_child(self, parent2):
-        child = ArgsPlan()
-        for i in range(3):
-            # crossover
-            child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
-            
-            # mutate
-            if random.randint(1, 10 * 3) == 1:
-                if i == 0:
-                    rand_val = child.chromosome[i] + int(0.1 * (random.randint(2, 100) - 0.5 * (2 + 100)))
-                if i == 1:
-                    rand_val = True if random.randint(0,1) == 0 else False
-                else:
-                    rand_val = child.chromosome[i] + 0.1 * (random.uniform(0, 1) - 0.5)
-                child.chromosome[i] = rand_val
-        return child
-        
-        
-    def get_fitness_value(self):
-        [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=self.chromosome[0], size_dependant_mutation_probability=self.chromosome[1], mutation_step_factor=self.chromosome[2], log=False)
-        return mean
-        
-        
-def find_algorithm_parameters():
-    ap = ArgsPlan()
-    ge = GeneticExecutor(ap, population_size=10, max_generations_number=1000, debug=True)
-    solution = ge.get_solution()
-    
-    
-def run_algorithm():
-
-    #[mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01, log=True)      # original values
-    [mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=61, size_dependant_mutation_probability=True, mutation_step_factor=0.8386711947606522, log=True)      # after 157 iterations of find_algorithm_parameters
-    #[mean, std] = run_iterations(population_size=200, max_generations_number=100, mutation_probability=62, size_dependant_mutation_probability=False, mutation_step_factor=0.84, log=True)
+    [mean, std] = run_iterations(genetic_executor=ge, iterations_num=iterations_num)
     
     print('==============================')
     print('Mean: ' + str(mean))
