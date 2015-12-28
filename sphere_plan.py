@@ -1,3 +1,5 @@
+import sys
+import statistics
 import random
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
@@ -43,10 +45,30 @@ class SpherePlan(Plan):
     def print_plan(self):
         print(self.chromosome)
             
+def main():
+    iterations_num = 1
+    debug = True
+    solutions = []
+    if len(sys.argv) > 1:
+        iterations_num = int(sys.argv[1])
+        debug = False
         
+    for _ in range(iterations_num):
+        sp = SpherePlan(10)
+        ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=debug)
+        solution = ge.get_solution()
+        if debug:
+            solution.print_plan()
+        print(solution.get_fitness_value())
+        solutions.append(solution.get_fitness_value())
+        
+    [mean, std] = [solutions[0], 0]
+    if len(solutions) > 1:
+        [mean, std] = [statistics.mean(solutions), statistics.stdev(solutions)]
+        
+    print('==============================')
+    print('Mean: ' + str(mean))
+    print('STD:  ' + str(std))
         
 if __name__ == '__main__':
-    sp = SpherePlan(10)
-    ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=True)
-    solution = ge.get_solution()
-    solution.print_plan()
+    main()
