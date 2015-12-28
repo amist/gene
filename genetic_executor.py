@@ -18,8 +18,10 @@ class Population:
         window_size = self.size / 10
         lb = int(percentage * (self.size - window_size))
         ub = int(window_size + percentage * (self.size - window_size - 1))
+        if ub - 1 > lb:
+            ub = ub - 1
         #print(percentage, lb, ub)
-        return self.population[random.randint(lb, ub - 1)]
+        return self.population[random.randint(lb, ub)]
         
     def _get_coindividual_with_uniform_choice(self, parent1):
         parent2 = None

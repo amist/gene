@@ -57,6 +57,7 @@ def main():
         sp = SpherePlan(10)
         ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=debug)
         solution = ge.get_solution()
+        
         if debug:
             solution.print_plan()
         print(solution.get_fitness_value())
