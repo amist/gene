@@ -6,7 +6,7 @@ from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
 from args_plan import ArgsPlan
 
-class RosenbrockPlanNaive(Plan):
+class SchwefelSinPlanNaive(Plan):
     def __init__(self, size=10, mutation_probability=10, size_dependant_mutation_probability=True, mutation_step_factor=0.01):
         self.chromosome = []
         self.size = size
@@ -30,7 +30,7 @@ class RosenbrockPlanNaive(Plan):
             
             
     def get_child(self, parent2):
-        child = RosenbrockPlanNaive(self.size)
+        child = SchwefelSinPlanNaive(self.size)
         for i in range(self.size):
             # crossover
             child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
@@ -80,7 +80,7 @@ def find_algorithm_parameters():
     # After 157 iterations:
     # mutation_probability=61, size_dependant_mutation_probability=True, mutation_step_factor=0.8386711947606522
     
-    sp = RosenbrockPlanNaive()
+    sp = SchwefelSinPlanNaive()
     inner_ge = GeneticExecutor(sp, debug=False)
     
     ap = ArgsPlan(inner_ge)
@@ -96,7 +96,7 @@ def run_algorithm():
         iterations_num = int(sys.argv[1])
         debug = False
         
-    sp = RosenbrockPlanNaive()
+    sp = SchwefelSinPlanNaive()
     ge = GeneticExecutor(sp, debug=debug)
     
     [mean, std] = run_iterations(genetic_executor=ge, iterations_num=iterations_num)
