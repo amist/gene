@@ -23,15 +23,15 @@ class SpherePlan(Plan):
         return chromosome
             
             
-    def get_child(self, parent2):
+    def get_child(self, parent2, mutation_factor=1):
         child = SpherePlan(self.size)
         for i in range(self.size):
             # crossover
             child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
             
             # mutate
-            if random.randint(1, 10 * self.size) == 1:
-                child.chromosome[i] = random.uniform(self._lower_bound, self._upper_bound)
+            if random.randint(1, int(10 * self.size / (mutation_factor + 1))) == 1:
+                child.chromosome[i] = mutation_factor * random.uniform(self._lower_bound, self._upper_bound)
         return child
         
         

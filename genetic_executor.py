@@ -2,20 +2,21 @@
 import random
 import copy
 import multiprocessing
+import statistics
 
 class Population:
-    def __init__(self, size=200, expansion_factor=5):
+    def __init__(self, individual, size=200, expansion_factor=5):
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
         self.coindividuals_num = 100
-        
-        
-    def init_random_population(self, individual):
+        fitness_values = []
         for _ in range(self.size):
             plan = copy.deepcopy(individual)
             plan.chromosome = plan.get_random_chromosome()
             self.population.append(plan)
+            fitness_values.append(plan.get_fitness_value())
+        self.initial_population_std = statistics.stdev(fitness_values)
         
         
     def _get_individual_with_uniform_choice(self):
@@ -91,12 +92,15 @@ class Population:
         
     def _expand_population(self):
         #print("========================")
+        cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
         for iter_num in range(self.size * (self.expansion_factor - 1)):
             #parent1 = self._get_individual_with_uniform_choice()
             #parent2 = self._get_individual_with_uniform_choice()
             parent1 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
             parent2 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
             child = parent1.get_child(parent2)
+            self.population.append(child)
+            child = parent1.get_child(parent2, cur_population_std / self.initial_population_std)
             self.population.append(child)
             #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         
@@ -144,8 +148,7 @@ class GeneticExecutor:
         
         
     def get_solution(self):
-        population = Population(size=self.population_size)
-        population.init_random_population(self.individual_instance)
+        population = Population(individual=self.individual_instance, size=self.population_size)
         
         for i in range(self.max_generations_number):
             if self.debug == True:

@@ -29,7 +29,7 @@ class SchwefelSinPlanNaive(Plan):
         return chromosome
             
             
-    def get_child(self, parent2):
+    def get_child(self, parent2, mutation_factor=1):
         child = SchwefelSinPlanNaive(self.size)
         for i in range(self.size):
             # crossover
@@ -37,9 +37,9 @@ class SchwefelSinPlanNaive(Plan):
             
             # mutate
             #print(self._actual_mutation_probability)
-            if random.randint(0, int(self._actual_mutation_probability)) == 0:
+            if random.randint(0, int(self._actual_mutation_probability / (mutation_factor + 1))) == 0:
                 rand_val = random.uniform(self._lower_bound, self._upper_bound)
-                rand_val = child.chromosome[i] + self._mutation_step_factor * (random.uniform(self._lower_bound, self._upper_bound) - 0.5 * (self._lower_bound + self._upper_bound))
+                rand_val = child.chromosome[i] + mutation_factor * self._mutation_step_factor * (random.uniform(self._lower_bound, self._upper_bound) - 0.5 * (self._lower_bound + self._upper_bound))
                 child.chromosome[i] = rand_val
         return child
         
