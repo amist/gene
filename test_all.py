@@ -36,7 +36,7 @@ def test_all():
     result &= test_plan(SchwefelDoubleSumPlanSeparable(10), 0.01)
     result &= test_plan(RosenbrockPlanNaive(10), 8)
     result &= test_plan(RosenbrockPlanSeparable(10), 8)
-    #result &= test_plan(SchwefelSinPlanNaive(10), 0.001)
+    result &= test_plan(SchwefelSinPlanNaive(10), 0.001)
     
     
     print('== Finished ==')
