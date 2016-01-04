@@ -1,6 +1,7 @@
 import sys
 import random
 import statistics
+import math
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
 from args_plan import ArgsPlan
@@ -46,9 +47,11 @@ class RosenbrockPlanSeparable(Plan):
     def get_solution_vector(self):
         solution = [self.chromosome[0]]
         for i in range(len(self.chromosome) - 1):
-            #solution.append(self.chromosome[i+1] - self.chromosome[i]**2)
-            #solution.append(self.chromosome[i+1] - self.chromosome[i])
-            solution.append( self.chromosome[i+1] + ( 200*self.chromosome[i]**2 + self.chromosome[i] - 1 ) / 200 )
+            #solution.append( self.chromosome[i+1] + ( 200*self.chromosome[i]**2 + 1 - self.chromosome[i] ) / 200 )
+            temp = self.chromosome[i] - (solution[i-1] - self.chromosome[i-1])**2
+            if temp < 0:
+                temp = 0
+            solution.append( solution[i-1]**2 + math.sqrt( temp ) / 200 )
         return solution
         
         
