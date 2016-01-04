@@ -1,3 +1,4 @@
+import sys
 from genetic_executor import GeneticExecutor
 from sphere_plan import SpherePlan
 from schwefel_double_sum_plan_naive import SchwefelDoubleSumPlanNaive
@@ -44,6 +45,7 @@ def test_all():
         print('OK')
     else:
         print('FAIL')
+        sys.exit(1)
         
         
 if __name__ == '__main__':
