@@ -100,7 +100,7 @@ class Population:
             parent2 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
             child = parent1.get_child(parent2)
             self.population.append(child)
-            child = parent1.get_child(parent2, cur_population_std / self.initial_population_std)
+            child = parent1.get_child(parent2, cur_population_std / (self.initial_population_std + 1))
             self.population.append(child)
             #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         
