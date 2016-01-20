@@ -3,6 +3,7 @@ import random
 import copy
 import multiprocessing
 import statistics
+import sys
 
 class Population:
     def __init__(self, individual, size=200, expansion_factor=5):
@@ -16,7 +17,10 @@ class Population:
             plan.chromosome = plan.get_random_chromosome()
             self.population.append(plan)
             fitness_values.append(plan.get_fitness_value())
-        self.initial_population_std = statistics.stdev(fitness_values)
+        try:
+            self.initial_population_std = statistics.stdev(fitness_values)
+        except OverflowError:
+            self.initial_population_std = sys.float_info.max
         
         
     def _get_individual_with_uniform_choice(self):
@@ -92,7 +96,10 @@ class Population:
         
     def _expand_population(self):
         #print("========================")
-        cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
+        try:
+            cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
+        except OverflowError:
+            cur_population_std = sys.float_info.max
         for iter_num in range(self.size * (self.expansion_factor - 1)):
             #parent1 = self._get_individual_with_uniform_choice()
             #parent2 = self._get_individual_with_uniform_choice()
@@ -136,6 +143,17 @@ class Plan:
         
     def print_plan(self):
         return
+        
+        
+def FitnessDecorator(f):
+    def inner(individual):
+        try:
+            #print('in inner ' + str(individual.chromosome) + ' ' + str(f(individual)))
+            #a = f(individual)
+            return f(individual)
+        except OverflowError:
+            return -sys.float_info.max
+    return inner
 
         
 class GeneticExecutor:
@@ -157,6 +175,7 @@ class GeneticExecutor:
             if self.debug == True:
                 print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
                 print('  Current optimal solution: ' + str(population.population[0].chromosome))
+                #print('  Current aggregated fitness' + str(population.population[0].aggregated_fitness))
             if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
                 break;
         if self.debug == True:
