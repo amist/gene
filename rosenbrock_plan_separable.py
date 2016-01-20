@@ -4,6 +4,7 @@ import statistics
 import math
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
+from genetic_executor import FitnessDecorator
 from args_plan import ArgsPlan
 
 class RosenbrockPlanSeparable(Plan):
@@ -55,6 +56,7 @@ class RosenbrockPlanSeparable(Plan):
         return solution
         
         
+    @FitnessDecorator
     def get_fitness_value(self):
         if self._fitness is not None:
             return self._fitness

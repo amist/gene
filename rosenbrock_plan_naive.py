@@ -3,6 +3,7 @@ import random
 import statistics
 from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
+from genetic_executor import FitnessDecorator
 from args_plan import ArgsPlan
 
 class RosenbrockPlanNaive(Plan):
@@ -43,6 +44,7 @@ class RosenbrockPlanNaive(Plan):
         return child
         
         
+    @FitnessDecorator
     def get_fitness_value(self):
         if self._fitness is not None:
             return self._fitness
