@@ -40,6 +40,10 @@ class SchwefelSinPlanNaive(Plan):
             if random.randint(0, int(self._actual_mutation_probability / (mutation_factor + 1))) == 0:
                 rand_val = random.uniform(self._lower_bound, self._upper_bound)
                 rand_val = child.chromosome[i] + mutation_factor * self._mutation_step_factor * (random.uniform(self._lower_bound, self._upper_bound) - 0.5 * (self._lower_bound + self._upper_bound))
+                if rand_val > self._upper_bound:
+                    rand_val = self._upper_bound
+                if rand_val < self._lower_bound:
+                    rand_val = self._lower_bound
                 child.chromosome[i] = rand_val
         return child
         
@@ -96,8 +100,8 @@ def run_algorithm():
         iterations_num = int(sys.argv[1])
         debug = False
         
-    sp = SchwefelSinPlanNaive()
-    ge = GeneticExecutor(sp, debug=debug)
+    sp = SchwefelSinPlanNaive(10)
+    ge = GeneticExecutor(sp, population_size = 200, max_generations_number=100, debug=debug)
     
     [mean, std] = run_iterations(genetic_executor=ge, iterations_num=iterations_num)
     
