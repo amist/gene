@@ -1,4 +1,6 @@
 from genetic_executor import Population
+from sphere_plan import SpherePlan
+from sphere_plan_aggregated_fitness import SphereAggregatedFitnessPlan
 from schwefel_sin_plan_naive import SchwefelSinPlanNaive
 from schwefel_sin_plan_aggregated_fitness import SchwefelSinPlanAggregatedFitness
 from rosenbrock_plan_naive import RosenbrockPlanNaive
@@ -9,7 +11,7 @@ from run_python_from_string import run_python_code
 
 def create_one_graph(instances, serial=None):
     population_size = 200
-    max_generations_number = 100
+    max_generations_number = 1000
     debug = True
     populations = [Population(individual=instance, size=population_size) for instance in instances]
     
@@ -38,6 +40,7 @@ xs = {xs}
 ys = {ys}
 colors = ['r', 'b', 'g', 'c', 'y', 'm', 'k']
 plt.clf()
+plt.grid(True)
 plt.yscale('log')
 [plt.plot(xs, y, '{{}}-'.format(c)) for [y, c] in zip(ys, colors)]
 
@@ -53,17 +56,21 @@ else:
         
 def create_graphs():
     for i in range(1):
-        #chromosome_size = 200
-        #instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
-        #create_one_graph(instances, i)
+        '''chromosome_size = 200
+        instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
+        create_one_graph(instances, i)
         
         chromosome_size = 50
         instances = [RosenbrockPlanNaive(size=chromosome_size), RosenbrockPlanSeparable(size=chromosome_size)]
         create_one_graph(instances, i)
         
-        #chromosome_size = 100
-        #instances = [SchwefelDoubleSumPlanNaive(size=chromosome_size), SchwefelDoubleSumPlanSeparable(size=chromosome_size)]
-        #create_one_graph(instances, i)
+        chromosome_size = 100
+        instances = [SchwefelDoubleSumPlanNaive(size=chromosome_size), SchwefelDoubleSumPlanSeparable(size=chromosome_size)]
+        create_one_graph(instances, i)'''
+        
+        chromosome_size = 100
+        instances = [SpherePlan(size=chromosome_size), SphereAggregatedFitnessPlan(size=chromosome_size)]
+        create_one_graph(instances, i)
     
     
 if __name__ == '__main__':
