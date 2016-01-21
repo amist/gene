@@ -5,11 +5,11 @@ from rosenbrock_plan_naive import RosenbrockPlanNaive
 from rosenbrock_plan_separable import RosenbrockPlanSeparable
 from schwefel_double_sum_plan_naive import SchwefelDoubleSumPlanNaive
 from schwefel_double_sum_plan_separable import SchwefelDoubleSumPlanSeparable
-import matplotlib.pyplot as plt
+from run_python_from_string import run_python_code
 
 def create_one_graph(instances, serial=None):
     population_size = 200
-    max_generations_number = 1000
+    max_generations_number = 100
     debug = True
     populations = [Population(individual=instance, size=population_size) for instance in instances]
     
@@ -30,30 +30,40 @@ def create_one_graph(instances, serial=None):
                 #break;
         [a.append(b) for a, b in zip(ys, [-population.population[0].get_fitness_value() for population in populations])]
     #print(ys)
-    plt.yscale('log')
-    [plt.plot(xs, y, '{}-'.format(c)) for [y, c] in zip(ys, colors)]
-    
-    if serial is None:
-        plt.show()
-    else:
-        filename = '_'.join([instance.__class__.__name__ for instance in instances])
-        filename += '_size_{}_population_{}_{:02d}.png'.format(instances[0].size, population_size, serial)
-        plt.savefig('images/' + filename)
+    filename = '_'.join([instance.__class__.__name__ for instance in instances])
+    filename += '_size_{}_population_{}_{:02d}.png'.format(instances[0].size, population_size, serial)
+    run_python_code('''
+import matplotlib.pyplot as plt
+xs = {xs}
+ys = {ys}
+colors = ['r', 'b', 'g', 'c', 'y', 'm', 'k']
+plt.clf()
+plt.yscale('log')
+[plt.plot(xs, y, '{{}}-'.format(c)) for [y, c] in zip(ys, colors)]
+
+if {serial} is None:
+    plt.show()
+else:
+    #filename = '_'.join([instance.__class__.__name__ for instance in instances])
+    #filename += '_size_{{}}_population_{{}}_{{:02d}}.png'.format(instances[0].size, population_size, {serial})
+    plt.savefig('images/' + {filename})
+'''.format(xs=repr(xs), ys=repr(ys), serial=repr(serial), filename=repr(filename)))
+#'''.format(xs='[1,2,3]', ys='[9,8,7]'))
         
         
 def create_graphs():
-    for i in range(20):
-        chromosome_size = 200
-        instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
-        create_one_graph(instances, i)
+    for i in range(1):
+        #chromosome_size = 200
+        #instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
+        #create_one_graph(instances, i)
         
         chromosome_size = 50
         instances = [RosenbrockPlanNaive(size=chromosome_size), RosenbrockPlanSeparable(size=chromosome_size)]
         create_one_graph(instances, i)
         
-        chromosome_size = 100
-        instances = [SchwefelDoubleSumPlanNaive(size=chromosome_size), SchwefelDoubleSumPlanSeparable(size=chromosome_size)]
-        create_one_graph(instances, i)
+        #chromosome_size = 100
+        #instances = [SchwefelDoubleSumPlanNaive(size=chromosome_size), SchwefelDoubleSumPlanSeparable(size=chromosome_size)]
+        #create_one_graph(instances, i)
     
     
 if __name__ == '__main__':
