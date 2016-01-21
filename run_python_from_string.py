@@ -11,7 +11,10 @@ def run_python_code(code):
         #print(p.stdout.read())
         for line in p.stdout.readlines():
             print(line.decode(), end='')
-    os.remove(filename)
+    try:
+        os.remove(filename)
+    except Exception:
+        print('Could not remove the file {}. Remove it in your own spare time'.format(filename))
         
     
     
