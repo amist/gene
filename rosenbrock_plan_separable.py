@@ -31,6 +31,8 @@ class RosenbrockPlanSeparable(Plan):
             
             
     def get_child(self, parent2, mutation_factor=1):
+        if math.isnan(mutation_factor):
+            mutation_factor = 1
         child = RosenbrockPlanSeparable(self.size)
         for i in range(self.size):
             # crossover
