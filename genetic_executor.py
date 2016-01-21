@@ -4,6 +4,7 @@ import copy
 import multiprocessing
 import statistics
 import sys
+import math
 
 class Population:
     def __init__(self, individual, size=200, expansion_factor=5):
@@ -20,7 +21,7 @@ class Population:
         try:
             self.initial_population_std = statistics.stdev(fitness_values)
         except OverflowError:
-            self.initial_population_std = sys.float_info.max
+            self.initial_population_std = int(sys.float_info.max / 10)
         
         
     def _get_individual_with_uniform_choice(self):
@@ -99,7 +100,7 @@ class Population:
         try:
             cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
         except OverflowError:
-            cur_population_std = sys.float_info.max
+            cur_population_std = int(sys.float_info.max / 10)
         for iter_num in range(self.size * (self.expansion_factor - 1)):
             #parent1 = self._get_individual_with_uniform_choice()
             #parent2 = self._get_individual_with_uniform_choice()
@@ -150,9 +151,12 @@ def FitnessDecorator(f):
         try:
             #print('in inner ' + str(individual.chromosome) + ' ' + str(f(individual)))
             #a = f(individual)
+            
+            if math.isnan(f(individual)):
+                return -int(sys.float_info.max / 10)
             return f(individual)
         except OverflowError:
-            return -sys.float_info.max
+            return -int(sys.float_info.max / 10)
     return inner
 
         
