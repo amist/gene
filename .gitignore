@@ -49,3 +49,4 @@ images/
 .metadata/
 .project
 .pydevproject
+*.p

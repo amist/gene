@@ -5,23 +5,46 @@ import multiprocessing
 import statistics
 import sys
 import math
+import pickle
 
 class Population:
-    def __init__(self, individual, size=200, expansion_factor=5):
+    def __init__(self, individual, size=200, expansion_factor=5, log_metadata=False):
+        
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
         self.coindividuals_num = 100
         fitness_values = []
+        
+        self.log_metadata = log_metadata
+        self.individuals_id = 0
+        self.generations_log = []
+        
         for _ in range(self.size):
             plan = copy.deepcopy(individual)
             plan.chromosome = plan.get_random_chromosome()
+            if self.log_metadata:
+                plan.id = self.get_id()
+                plan.parent1_id = -1
+                plan.parent2_id = -1
             self.population.append(plan)
             fitness_values.append(plan.get_fitness_value())
         try:
             self.initial_population_std = statistics.stdev(fitness_values)
         except OverflowError:
             self.initial_population_std = int(sys.float_info.max / 10)
+            
+        if self.log_metadata:
+            self.generations_log.append(self.get_population_log())
+        
+        
+    def get_id(self):
+        self.individuals_id += 1
+        return self.individuals_id - 1
+        
+        
+    def get_population_log(self):
+        return [(individual.id, individual.parent1_id, individual.parent2_id, individual.get_fitness_value()) for individual in self.population]
         
         
     def _get_individual_with_uniform_choice(self):
@@ -90,6 +113,8 @@ class Population:
         self._expand_population()
 #         self._calculate_fintesses()
         self._sort_population()
+        if self.log_metadata:
+            self.generations_log.append(self.get_population_log())
         #self._distinct_population()
         self._cut_population()
         #self.population[0].print_plan()
@@ -107,8 +132,17 @@ class Population:
             parent1 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
             parent2 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
             child = parent1.get_child(parent2)
+            if self.log_metadata:
+                child.id = self.get_id()
+                child.parent1_id = parent1.id
+                child.parent2_id = parent2.id
             self.population.append(child)
+            
             child = parent1.get_child(parent2, cur_population_std / (self.initial_population_std + 1))
+            if self.log_metadata:
+                child.id = self.get_id()
+                child.parent1_id = parent1.id
+                child.parent2_id = parent2.id
             self.population.append(child)
             #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         
@@ -162,26 +196,29 @@ def FitnessDecorator(f):
         
 class GeneticExecutor:
 
-    def __init__(self, individual_instance, population_size=200, max_generations_number=100, debug=False):
+    def __init__(self, individual_instance, population_size=200, max_generations_number=100, debug=False, log_metadata=False):
         self.individual_instance = copy.deepcopy(individual_instance)
         self.population_size = population_size
         self.max_generations_number = max_generations_number
         self.debug = debug
+        self.log_metadata = log_metadata
         
         
     def get_solution(self):
-        population = Population(individual=self.individual_instance, size=self.population_size)
+        population = Population(individual=self.individual_instance, size=self.population_size, log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
-            if self.debug == True:
+            if self.debug:
                 print('Processing generation %d' % i)
             population.process_generation()
-            if self.debug == True:
+            if self.debug:
                 print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
                 print('  Current optimal solution: ' + str(population.population[0].chromosome))
                 #print('  Current aggregated fitness' + str(population.population[0].aggregated_fitness))
             if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
                 break;
-        if self.debug == True:
+        if self.debug:
             population.population[0].print_plan()
+        if self.log_metadata:
+            pickle.dump(population.generations_log, open('generations_data.p', 'wb'))
         return population.population[0]
