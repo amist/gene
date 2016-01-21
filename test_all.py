@@ -1,6 +1,7 @@
 import sys
 from genetic_executor import GeneticExecutor
 from sphere_plan import SpherePlan
+from sphere_plan_aggregated_fitness import SphereAggregatedFitnessPlan
 from schwefel_double_sum_plan_naive import SchwefelDoubleSumPlanNaive
 from schwefel_double_sum_plan_separable import SchwefelDoubleSumPlanSeparable
 from rosenbrock_plan_naive import RosenbrockPlanNaive
@@ -17,7 +18,7 @@ def test_plan(plan, value):
         solution = ge.get_solution()
         print(solution.get_fitness_value(), end=' ')
         try:
-            assert solution.get_fitness_value() > -value
+            assert solution.get_fitness_value() >= -value
         except AssertionError:
             # Don't do anything. Will fail outside of the loop after TIMES_TO_FAIL times
             pass
@@ -32,7 +33,8 @@ def test_plan(plan, value):
     
 def test_all():
     result = True
-    result &= test_plan(SpherePlan(10), 0.002)
+    result &= test_plan(SpherePlan(10), 1e-100)
+    result &= test_plan(SphereAggregatedFitnessPlan(10), 0)
     result &= test_plan(SchwefelDoubleSumPlanNaive(10), 10)
     result &= test_plan(SchwefelDoubleSumPlanSeparable(10), 0.01)
     result &= test_plan(RosenbrockPlanNaive(10), 8)
