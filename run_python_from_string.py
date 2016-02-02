@@ -3,7 +3,7 @@ import subprocess
 import os
 
 def run_python_code(code):
-    filename = ''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUZWXYZ0123456789') for i in range(8)) + '.py'
+    filename = '_temp_' + ''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUZWXYZ0123456789') for i in range(8)) + '.py'
     with open(filename, 'w') as python_file:
         python_file.write(code)
         python_file.flush()

@@ -49,6 +49,10 @@ class SphereAggregatedFitnessPlan(Plan):
         return self._fitness
         
         
+    def get_optimal_value(self):
+        return 0
+        
+        
     def print_plan(self):
         print(self.chromosome)
             
