@@ -2,16 +2,18 @@ from genetic_executor import Population
 from sphere_plan import SpherePlan
 from sphere_plan_aggregated_fitness import SphereAggregatedFitnessPlan
 from schwefel_sin_plan_naive import SchwefelSinPlanNaive
+from schwefel_sin_plan_naive_const_mutation_factor import SchwefelSinPlanNaiveConstMutationFactor
 from schwefel_sin_plan_aggregated_fitness import SchwefelSinPlanAggregatedFitness
 from rosenbrock_plan_naive import RosenbrockPlanNaive
 from rosenbrock_plan_separable import RosenbrockPlanSeparable
 from schwefel_double_sum_plan_naive import SchwefelDoubleSumPlanNaive
 from schwefel_double_sum_plan_separable import SchwefelDoubleSumPlanSeparable
+from schwefel_sin_plan_mutation_selection import SchwefelSinMutationSelection
 from run_python_from_string import run_python_code
 
-def create_one_graph(instances, serial=None):
+def create_one_graph(instances, serial=-1):
     population_size = 200
-    max_generations_number = 1000
+    max_generations_number = 100
     debug = True
     populations = [Population(individual=instance, size=population_size) for instance in instances]
     
@@ -44,7 +46,7 @@ plt.grid(True)
 plt.yscale('log')
 [plt.plot(xs, y, '{{}}-'.format(c)) for [y, c] in zip(ys, colors)]
 
-if {serial} is None:
+if {serial}==-1:
     plt.show()
 else:
     #filename = '_'.join([instance.__class__.__name__ for instance in instances])
@@ -55,21 +57,29 @@ else:
         
         
 def create_graphs():
-    for i in range(1):
-        '''chromosome_size = 200
-        instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
-        create_one_graph(instances, i)
-        
-        chromosome_size = 50
-        instances = [RosenbrockPlanNaive(size=chromosome_size), RosenbrockPlanSeparable(size=chromosome_size)]
-        create_one_graph(instances, i)
+    for i in range(5):
+        #chromosome_size = 200
+        #instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
+        #create_one_graph(instances, i)
+        #
+        #chromosome_size = 50
+        #instances = [RosenbrockPlanNaive(size=chromosome_size), RosenbrockPlanSeparable(size=chromosome_size)]
+        #create_one_graph(instances, i)
+        #
+        #chromosome_size = 200
+        #instances = [SchwefelDoubleSumPlanNaive(size=chromosome_size), SchwefelDoubleSumPlanSeparable(size=chromosome_size)]
+        #create_one_graph(instances, i)
+        #
+        #chromosome_size = 1000
+        #instances = [SpherePlan(size=chromosome_size), SphereAggregatedFitnessPlan(size=chromosome_size)]
+        #create_one_graph(instances, i)
+        #
+        #chromosome_size = 100
+        #instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinMutationSelection(size=chromosome_size)]
+        #create_one_graph(instances, i)
         
         chromosome_size = 100
-        instances = [SchwefelDoubleSumPlanNaive(size=chromosome_size), SchwefelDoubleSumPlanSeparable(size=chromosome_size)]
-        create_one_graph(instances, i)'''
-        
-        chromosome_size = 100
-        instances = [SpherePlan(size=chromosome_size), SphereAggregatedFitnessPlan(size=chromosome_size)]
+        instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanNaiveConstMutationFactor(size=chromosome_size)]
         create_one_graph(instances, i)
     
     
