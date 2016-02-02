@@ -13,7 +13,6 @@ class Population:
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
-        self.coindividuals_num = 100
         fitness_values = []
         
         self.log_metadata = log_metadata
@@ -47,11 +46,11 @@ class Population:
         return [(individual.id, individual.parent1_id, individual.parent2_id, individual.get_fitness_value()) for individual in self.population]
         
         
-    def _get_individual_with_uniform_choice(self):
+    def get_individual_with_uniform_choice(self):
         return self.population[random.randint(0, len(self.population) - 1)]
         
         
-    def _get_individual_with_moving_window(self, percentage):
+    def get_individual_with_moving_window(self, percentage):
         window_size = self.size / 10
         lb = int(percentage * (self.size - window_size))
         ub = int(window_size + percentage * (self.size - window_size - 1))
@@ -61,18 +60,7 @@ class Population:
         return self.population[random.randint(lb, ub)]
         
         
-    def _get_coindividual_with_uniform_choice(self, parent1):
-        parent2 = None
-        max_fitness = None
-        for _ in range(self.coindividuals_num):
-            other = self.population[random.randint(0, len(self.population) - 1)]
-            if max_fitness is None or max_fitness < parent1.get_cofitness_value(other):
-                parent2 = other
-                max_fitness = parent1.get_cofitness_value(other)
-        return parent2
-        
-        
-    def _get_individual_with_weighted_choice(self):
+    def get_individual_with_weighted_choice(self):
         choices = self.population
         f_values = [c.get_fitness_value() for c in choices]
         
@@ -88,49 +76,30 @@ class Population:
             if upto + f > r:
                 return c
             upto += f
-        assert False, "In _get_individual_with_weighted_choice. Shouldn't get here"
-        
-        
-    def _calculate_fitness_concurrently(self, individual, i, res_dict):
-        res_dict[i] = individual.get_fitness_value()
-        
-        
-    def _calculate_fintesses(self):
-        manager = multiprocessing.Manager()
-        res_dict = manager.dict()
-        jobs = []
-        for i in range(len(self.population)):
-            p = multiprocessing.Process(target=self._calculate_fitness_concurrently(self.population[i], i, res_dict))
-            jobs.append(p)
-            p.start()
-        for job in jobs:
-            job.join()
-        for i in range(len(self.population)):
-            self.population[i]._fitness = res_dict[i]
+        assert False, "In get_individual_with_weighted_choice. Shouldn't get here"
         
         
     def process_generation(self):
-        self._expand_population()
-#         self._calculate_fintesses()
-        self._sort_population()
+        self.expand_population()
+        self.sort_population()
         if self.log_metadata:
             self.generations_log.append(self.get_population_log())
         #self._distinct_population()
-        self._cut_population()
+        self.cut_population()
         #self.population[0].print_plan()
         
         
-    def _expand_population(self):
+    def expand_population(self):
         #print("========================")
         try:
             cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
         except OverflowError:
             cur_population_std = int(sys.float_info.max / 10)
         for iter_num in range(self.size * (self.expansion_factor - 1)):
-            #parent1 = self._get_individual_with_uniform_choice()
-            #parent2 = self._get_individual_with_uniform_choice()
-            parent1 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
-            parent2 = self._get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
+            #parent1 = self.get_individual_with_uniform_choice()
+            #parent2 = self.get_individual_with_uniform_choice()
+            parent1 = self.get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
+            parent2 = self.get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
             child = parent1.get_child(parent2)
             if self.log_metadata:
                 child.id = self.get_id()
@@ -144,18 +113,14 @@ class Population:
                 child.parent1_id = parent1.id
                 child.parent2_id = parent2.id
             self.population.append(child)
-            #self.population.append(self._get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
+            #self.population.append(self.get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         
         
-    def _sort_population(self):
+    def sort_population(self):
         self.population.sort(key=lambda x: -x.get_fitness_value())
         
         
-    def _distinct_population(self):
-        raise NotImplementedError
-        
-        
-    def _cut_population(self):
+    def cut_population(self):
         self.population = self.population[0:self.size - 1]
             
             
@@ -204,18 +169,21 @@ class GeneticExecutor:
         self.log_metadata = log_metadata
         
         
+    def print_debug_info(self, population, i):
+        print('Generation %d has been processed' % i)
+        print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
+        print('  Current optimal solution: ' + str(population.population[0].chromosome))
+        
     def get_solution(self):
         population = Population(individual=self.individual_instance, size=self.population_size, log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
-            if self.debug:
-                print('Processing generation %d' % i)
             population.process_generation()
             if self.debug:
-                print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
-                print('  Current optimal solution: ' + str(population.population[0].chromosome))
-                #print('  Current aggregated fitness' + str(population.population[0].aggregated_fitness))
+                self.print_debug_info(population, i)
             if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
+                if self.debug:
+                    print('== Optimal value has been reached! ==')
                 break;
         if self.debug:
             population.population[0].print_plan()
