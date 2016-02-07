@@ -95,6 +95,9 @@ class Population:
             cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
         except OverflowError:
             cur_population_std = int(sys.float_info.max / 10)
+        mean_genes = [statistics.mean(individual.chromosome[i] for individual in self.population) for i in range(self.population[0].size)]
+        std_genes = [statistics.stdev(individual.chromosome[i] for individual in self.population) for i in range(self.population[0].size)]
+        #print(std_genes)
         for iter_num in range(self.size * (self.expansion_factor - 1)):
             #parent1 = self.get_individual_with_uniform_choice()
             #parent2 = self.get_individual_with_uniform_choice()
@@ -108,6 +111,7 @@ class Population:
             self.population.append(child)
             
             child = parent1.get_child(parent2, cur_population_std / (self.initial_population_std + 1))
+            #child = parent1.get_child(parent2, mean_genes, std_genes)
             if self.log_metadata:
                 child.id = self.get_id()
                 child.parent1_id = parent1.id

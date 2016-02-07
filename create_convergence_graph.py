@@ -13,7 +13,7 @@ from run_python_from_string import run_python_code
 
 def create_one_graph(instances, serial=-1):
     population_size = 200
-    max_generations_number = 100
+    max_generations_number = 150
     debug = True
     populations = [Population(individual=instance, size=population_size) for instance in instances]
     
@@ -57,7 +57,7 @@ else:
         
         
 def create_graphs():
-    for i in range(5):
+    for i in range(1):
         #chromosome_size = 200
         #instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanAggregatedFitness(size=chromosome_size)]
         #create_one_graph(instances, i)
@@ -78,9 +78,9 @@ def create_graphs():
         #instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinMutationSelection(size=chromosome_size)]
         #create_one_graph(instances, i)
         
-        chromosome_size = 100
+        chromosome_size = 10
         instances = [SchwefelSinPlanNaive(size=chromosome_size), SchwefelSinPlanNaiveConstMutationFactor(size=chromosome_size)]
-        create_one_graph(instances, i)
+        create_one_graph(instances, 4)
     
     
 if __name__ == '__main__':

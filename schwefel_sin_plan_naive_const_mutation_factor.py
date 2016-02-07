@@ -29,7 +29,7 @@ class SchwefelSinPlanNaiveConstMutationFactor(Plan):
         return chromosome
             
             
-    def get_child(self, parent2, mutation_factor=1):
+    def get_child(self, parent2, mean_genes=None, std_genes=None):
         mutation_factor = 1
         child = SchwefelSinPlanNaiveConstMutationFactor(self.size)
         for i in range(self.size):
@@ -101,7 +101,7 @@ def run_algorithm():
         iterations_num = int(sys.argv[1])
         debug = False
         
-    sp = SchwefelSinPlanNaiveConstMutationFactor(10)
+    sp = SchwefelSinPlanNaiveConstMutationFactor(1)
     ge = GeneticExecutor(sp, population_size = 200, max_generations_number=100, debug=debug)
     
     [mean, std] = run_iterations(genetic_executor=ge, iterations_num=iterations_num)
