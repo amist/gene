@@ -1,7 +1,5 @@
-#from random import randint
 import random
 import copy
-import multiprocessing
 import statistics
 import sys
 import math
@@ -9,7 +7,6 @@ import pickle
 
 class Population:
     def __init__(self, individual, size=200, expansion_factor=5, log_metadata=False):
-        
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
@@ -43,7 +40,10 @@ class Population:
         
         
     def get_population_log(self):
-        return [(individual.id, individual.parent1_id, individual.parent2_id, individual.get_fitness_value()) for individual in self.population]
+        return [(individual.id, 
+                 individual.parent1_id, 
+                 individual.parent2_id, 
+                 individual.get_fitness_value()) for individual in self.population]
         
         
     def get_individual_with_uniform_choice(self):
@@ -52,12 +52,12 @@ class Population:
         
     def get_individual_with_moving_window(self, percentage):
         window_size = self.size / 10
-        lb = int(percentage * (self.size - window_size))
-        ub = int(window_size + percentage * (self.size - window_size - 1))
-        if ub - 1 > lb:
-            ub = ub - 1
-        #print(percentage, lb, ub)
-        return self.population[random.randint(lb, ub)]
+        lower_bound = int(percentage * (self.size - window_size))
+        upper_bound = int(window_size + percentage * (self.size - window_size - 1))
+        if upper_bound - 1 > lower_bound:
+            upper_bound = upper_bound - 1
+        #print(percentage, lower_bound, upper_bound)
+        return self.population[random.randint(lower_bound, upper_bound)]
         
         
     def get_individual_with_weighted_choice(self):
@@ -68,13 +68,13 @@ class Population:
         factor = -min(f_values) + 1
         total = sum(f_values) + factor * len(f_values)
         #print 'total =', total
-        r = random.uniform(0, total)
+        rand_number = random.uniform(0, total)
         upto = 0
-        for c in choices:
+        for choice in choices:
             #print 'upto =', upto
-            f = c.get_fitness_value() + factor
-            if upto + f > r:
-                return c
+            f = choice.get_fitness_value() + factor
+            if upto + f > rand_number:
+                return choice
             upto += f
         assert False, "In get_individual_with_weighted_choice. Shouldn't get here"
         
@@ -92,11 +92,16 @@ class Population:
     def expand_population(self):
         #print("========================")
         try:
-            cur_population_std = statistics.stdev([individual.get_fitness_value() for individual in self.population])
+            cur_population_std = statistics.stdev([individual.get_fitness_value()
+                                                   for individual in self.population])
         except OverflowError:
             cur_population_std = int(sys.float_info.max / 10)
-        mean_genes = [statistics.mean(individual.chromosome[i] for individual in self.population) for i in range(self.population[0].size)]
-        std_genes = [statistics.stdev(individual.chromosome[i] for individual in self.population) for i in range(self.population[0].size)]
+        #mean_genes = [statistics.mean(individual.chromosome[i]
+        #                              for individual in self.population)
+        #              for i in range(self.population[0].size)]
+        #std_genes = [statistics.stdev(individual.chromosome[i]
+        #                              for individual in self.population)
+        #             for i in range(self.population[0].size)]
         #print(std_genes)
         for iter_num in range(self.size * (self.expansion_factor - 1)):
             #parent1 = self.get_individual_with_uniform_choice()
@@ -110,14 +115,14 @@ class Population:
                 child.parent2_id = parent2.id
             self.population.append(child)
             
-            child = parent1.get_child(parent2, cur_population_std / (self.initial_population_std + 1))
+            child = parent1.get_child(parent2,
+                                      cur_population_std / (self.initial_population_std + 1))
             #child = parent1.get_child(parent2, mean_genes, std_genes)
             if self.log_metadata:
                 child.id = self.get_id()
                 child.parent1_id = parent1.id
                 child.parent2_id = parent2.id
             self.population.append(child)
-            #self.population.append(self.get_individual_with_weighted_choice().get_child(self._get_individual_with_weighted_choice()))
         
         
     def sort_population(self):
@@ -133,7 +138,7 @@ class Plan:
         raise NotImplementedError('You have to implemtent a get_random_chromosome function')
     
     
-    def get_child(self, parent2):
+    def get_child(self, parent2, mutation_factor):
         raise NotImplementedError('You have to implemtent a get_child function')
         
         
@@ -149,15 +154,15 @@ class Plan:
         return
         
         
-def FitnessDecorator(f):
+def FitnessDecorator(func):
     def inner(individual):
         try:
-            #print('in inner ' + str(individual.chromosome) + ' ' + str(f(individual)))
-            #a = f(individual)
+            #print('in inner ' + str(individual.chromosome) + ' ' + str(func(individual)))
+            #a = func(individual)
             
-            if math.isnan(f(individual)):
+            if math.isnan(func(individual)):
                 return -int(sys.float_info.max / 10)
-            return f(individual)
+            return func(individual)
         except OverflowError:
             return -int(sys.float_info.max / 10)
     return inner
@@ -165,7 +170,8 @@ def FitnessDecorator(f):
         
 class GeneticExecutor:
 
-    def __init__(self, individual_instance, population_size=200, max_generations_number=100, debug=False, log_metadata=False):
+    def __init__(self, individual_instance, population_size=200,
+                 max_generations_number=100, debug=False, log_metadata=False):
         self.individual_instance = copy.deepcopy(individual_instance)
         self.population_size = population_size
         self.max_generations_number = max_generations_number
@@ -179,16 +185,17 @@ class GeneticExecutor:
         print('  Current optimal solution: ' + str(population.population[0].chromosome))
         
     def get_solution(self):
-        population = Population(individual=self.individual_instance, size=self.population_size, log_metadata=self.log_metadata)
+        population = Population(individual=self.individual_instance,
+                                size=self.population_size, log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
             population.process_generation()
             if self.debug:
                 self.print_debug_info(population, i)
-            if (population.population[0].get_fitness_value() == population.population[0].get_optimal_value()):
+            if population.population[0].get_fitness_value() == population.population[0].get_optimal_value():
                 if self.debug:
                     print('== Optimal value has been reached! ==')
-                break;
+                break
         if self.debug:
             population.population[0].print_plan()
         if self.log_metadata:

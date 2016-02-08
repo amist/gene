@@ -5,8 +5,8 @@ from genetic_executor import GeneticExecutor
 from genetic_executor import Plan
 
 class SpherePlan(Plan):
-    def __init__(self, size = 10, chromosome = None):
-        if (chromosome is None):
+    def __init__(self, size=10, chromosome=None):
+        if chromosome is None:
             self.chromosome = []
         else:
             self.chromosome = chromosome
@@ -27,11 +27,14 @@ class SpherePlan(Plan):
         child = SpherePlan(self.size)
         for i in range(self.size):
             # crossover
-            child.chromosome.append(self.chromosome[i] if random.randint(0, 1) == 0 else parent2.chromosome[i])
+            child.chromosome.append(self.chromosome[i]
+                                    if random.randint(0, 1) == 0
+                                    else parent2.chromosome[i])
             
             # mutate
             if random.randint(1, int(10 * self.size / (mutation_factor + 1))) == 1:
-                child.chromosome[i] = mutation_factor * random.uniform(self._lower_bound, self._upper_bound)
+                child.chromosome[i] = mutation_factor * \
+                                      random.uniform(self._lower_bound, self._upper_bound)
         return child
         
         
@@ -54,9 +57,10 @@ def main():
         debug = False
         
     for _ in range(iterations_num):
-        sp = SpherePlan(10)
-        ge = GeneticExecutor(sp, population_size = 200, max_generations_number = 100, debug=debug)
-        solution = ge.get_solution()
+        sphere_plan = SpherePlan(10)
+        genetic_executor = GeneticExecutor(sphere_plan, population_size=200,
+                                           max_generations_number=100, debug=debug)
+        solution = genetic_executor.get_solution()
         
         if debug:
             solution.print_plan()
@@ -73,3 +77,4 @@ def main():
         
 if __name__ == '__main__':
     main()
+    
