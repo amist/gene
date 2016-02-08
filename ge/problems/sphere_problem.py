@@ -11,13 +11,6 @@ class SphereIndividual(Individual):
         self._fitness = None
         self._lower_bound = -5.12
         self._upper_bound = 5.12
-        
-        
-    def get_random_chromosome(self):
-        chromosome = []
-        for _ in range(self.size):
-            chromosome.append(random.uniform(self._lower_bound, self._upper_bound))
-        return chromosome
             
             
     def get_child(self, parent2, mutation_factor=1):
@@ -42,6 +35,6 @@ class SphereIndividual(Individual):
         return self._fitness
         
         
-    def print_plan(self):
+    def print_chromosome(self):
         print(self.chromosome)
         

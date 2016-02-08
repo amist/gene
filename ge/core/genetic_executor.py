@@ -8,10 +8,11 @@ from .population import Population
 
 class GeneticExecutor:
 
-    def __init__(self, individual_class, kwargs, population_size=200,
+    def __init__(self, individual_class, individual_kwargs=None, population_size=200,
                  max_generations_number=100, debug=False, log_metadata=False):
         #self.individual_instance = copy.deepcopy(individual_instance)
-        self.individual_instance = individual_class(**kwargs)
+        self.individual_kwargs = individual_kwargs
+        self.individual_class = individual_class
         self.population_size = population_size
         self.max_generations_number = max_generations_number
         self.debug = debug
@@ -24,7 +25,7 @@ class GeneticExecutor:
         print('  Current optimal solution: ' + str(population.population[0].chromosome))
         
     def get_solution(self):
-        population = Population(individual=self.individual_instance,
+        population = Population(individual_class=self.individual_class, individual_kwargs=self.individual_kwargs,
                                 size=self.population_size, log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
@@ -36,7 +37,7 @@ class GeneticExecutor:
                     print('== Optimal value has been reached! ==')
                 break
         if self.debug:
-            population.population[0].print_plan()
+            population.population[0].print_chromosome()
         if self.log_metadata:
             pickle.dump(population.generations_log, open('generations_data.p', 'wb'))
         return population.population[0]

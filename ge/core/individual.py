@@ -7,7 +7,10 @@ import pickle
 
 class Individual:
     def get_random_chromosome(self):
-        raise NotImplementedError('You have to implemtent a get_random_chromosome function')
+        chromosome = []
+        for _ in range(self.size):
+            chromosome.append(random.uniform(self._lower_bound, self._upper_bound))
+        return chromosome
     
     
     def get_child(self, parent2, mutation_factor):

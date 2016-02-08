@@ -6,7 +6,7 @@ import math
 import pickle
 
 class Population:
-    def __init__(self, individual, size=200, expansion_factor=5, log_metadata=False):
+    def __init__(self, individual_class, individual_kwargs=None, size=200, expansion_factor=5, log_metadata=False):
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
@@ -17,14 +17,14 @@ class Population:
         self.generations_log = []
         
         for _ in range(self.size):
-            plan = copy.deepcopy(individual)
-            plan.chromosome = plan.get_random_chromosome()
+            individual = individual_class(**individual_kwargs)
+            individual.chromosome = individual.get_random_chromosome()
             if self.log_metadata:
-                plan.id = self.get_id()
-                plan.parent1_id = -1
-                plan.parent2_id = -1
-            self.population.append(plan)
-            fitness_values.append(plan.get_fitness_value())
+                individual.id = self.get_id()
+                individual.parent1_id = -1
+                individual.parent2_id = -1
+            self.population.append(individual)
+            fitness_values.append(individual.get_fitness_value())
         try:
             self.initial_population_std = statistics.stdev(fitness_values)
         except OverflowError:
@@ -84,9 +84,7 @@ class Population:
         self.sort_population()
         if self.log_metadata:
             self.generations_log.append(self.get_population_log())
-        #self._distinct_population()
         self.cut_population()
-        #self.population[0].print_plan()
         
         
     def expand_population(self):
