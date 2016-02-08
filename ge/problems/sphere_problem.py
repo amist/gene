@@ -1,4 +1,3 @@
-import random
 from ..core.individual import Individual
 
 class SphereIndividual(Individual):

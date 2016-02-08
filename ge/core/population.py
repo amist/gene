@@ -1,12 +1,14 @@
 import random
-import copy
 import statistics
 import sys
-import math
-import pickle
 
 class Population:
-    def __init__(self, individual_class, individual_kwargs=None, size=200, expansion_factor=5, log_metadata=False):
+    def __init__(self,
+                 individual_class,
+                 individual_kwargs=None,
+                 size=200,
+                 expansion_factor=5,
+                 log_metadata=False):
         self.population = []
         self.size = size
         self.expansion_factor = expansion_factor
@@ -46,11 +48,11 @@ class Population:
                  individual.get_fitness_value()) for individual in self.population]
         
         
-    def get_individual_with_uniform_choice(self):
+    def get_individual_uniform_choice(self):
         return self.population[random.randint(0, len(self.population) - 1)]
         
         
-    def get_individual_with_moving_window(self, percentage):
+    def get_individual_moving_window(self, percentage):
         window_size = self.size / 10
         lower_bound = int(percentage * (self.size - window_size))
         upper_bound = int(window_size + percentage * (self.size - window_size - 1))
@@ -60,23 +62,23 @@ class Population:
         return self.population[random.randint(lower_bound, upper_bound)]
         
         
-    def get_individual_with_weighted_choice(self):
-        choices = self.population
-        f_values = [c.get_fitness_value() for c in choices]
+    # def get_individual_weighted_choice(self):
+        # choices = self.population
+        # f_values = [c.get_fitness_value() for c in choices]
         
-        # factor - ensure the minimum value is 1 (especially to avoid negative values)
-        factor = -min(f_values) + 1
-        total = sum(f_values) + factor * len(f_values)
-        #print 'total =', total
-        rand_number = random.uniform(0, total)
-        upto = 0
-        for choice in choices:
-            #print 'upto =', upto
-            f = choice.get_fitness_value() + factor
-            if upto + f > rand_number:
-                return choice
-            upto += f
-        assert False, "In get_individual_with_weighted_choice. Shouldn't get here"
+        # # factor - ensure the minimum value is 1 (especially to avoid negative values)
+        # factor = -min(f_values) + 1
+        # total = sum(f_values) + factor * len(f_values)
+        # #print 'total =', total
+        # rand_number = random.uniform(0, total)
+        # upto = 0
+        # for choice in choices:
+            # #print 'upto =', upto
+            # f = choice.get_fitness_value() + factor
+            # if upto + f > rand_number:
+                # return choice
+            # upto += f
+        # assert False, "In get_individual_with_weighted_choice. Shouldn't get here"
         
         
     def process_generation(self):
@@ -104,8 +106,9 @@ class Population:
         for iter_num in range(self.size * (self.expansion_factor - 1)):
             #parent1 = self.get_individual_with_uniform_choice()
             #parent2 = self.get_individual_with_uniform_choice()
-            parent1 = self.get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
-            parent2 = self.get_individual_with_moving_window(iter_num / (self.size * (self.expansion_factor - 1)))
+            window_percentage = iter_num / (self.size * (self.expansion_factor - 1))
+            parent1 = self.get_individual_moving_window(window_percentage)
+            parent2 = self.get_individual_moving_window(window_percentage)
             child = parent1.get_child(parent2)
             if self.log_metadata:
                 child.id = self.get_id()
