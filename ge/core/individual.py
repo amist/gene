@@ -7,7 +7,7 @@ import pickle
 
 class Individual:
     def __init__(self):
-        self._fitness = None
+        self.fitness_value = None
         self.chromosome = []
         
         
@@ -19,6 +19,9 @@ class Individual:
     
     
     def get_child(self, parent2, mutation_factor=1):
+        # TODO: separate into two functions: crossover, mutation
+        # TODO: get rid of mutation_factor parameter
+        
         child = self.__class__(**self.kwargs)
         for i in range(self.size):
             # crossover
@@ -38,10 +41,10 @@ class Individual:
         
         
     def get_fitness_value(self):
-        if self._fitness is not None:
-            return self._fitness
-        self._fitness = self.calculate_fitness_value()
-        return self._fitness
+        if self.fitness_value is not None:
+            return self.fitness_value
+        self.fitness_value = self.calculate_fitness_value()
+        return self.fitness_value
         
         
     def get_optimal_value(self):

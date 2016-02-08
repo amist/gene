@@ -2,9 +2,11 @@ import sys
 import statistics
 import random
 from ge.core.genetic_executor import GeneticExecutor
-from ge.problems.sphere_problem import SphereIndividual
+from ge.problems import *
             
-def main():
+def run_itarations(individual_class, individual_kwargs):
+    # TODO: use argparse
+    
     iterations_num = 1
     debug = True
     results = []
@@ -13,7 +15,7 @@ def main():
         debug = False
         
     for _ in range(iterations_num):
-        genetic_executor = GeneticExecutor(SphereIndividual, {'size': 10}, population_size=200, max_generations_number=100)    
+        genetic_executor = GeneticExecutor(individual_class, individual_kwargs, population_size=200, max_generations_number=100)    
         solution = genetic_executor.get_solution()
         
         if debug:
@@ -30,4 +32,4 @@ def main():
     print('STD:  ' + str(std))
         
 if __name__ == '__main__':
-    main()
+    run_itarations(SphereIndividual, {'size': 10})
