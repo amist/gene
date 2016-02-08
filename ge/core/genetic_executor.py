@@ -1,8 +1,3 @@
-import random
-import copy
-import statistics
-import sys
-import math
 import pickle
 from .population import Population
 
@@ -25,8 +20,10 @@ class GeneticExecutor:
         print('  Current optimal solution: ' + str(population.population[0].chromosome))
         
     def get_solution(self):
-        population = Population(individual_class=self.individual_class, individual_kwargs=self.individual_kwargs,
-                                size=self.population_size, log_metadata=self.log_metadata)
+        population = Population(individual_class=self.individual_class,
+                                individual_kwargs=self.individual_kwargs,
+                                size=self.population_size,
+                                log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
             population.process_generation()
