@@ -2,4 +2,6 @@ language: python
 python:
     #- "3.4"
     - "pypy3"
-script: pypy test_all.py
+script: 
+    - pypy test_all.py
+    - pypy test_all_new.py
