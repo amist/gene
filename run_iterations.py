@@ -1,3 +1,5 @@
+'''Run the algorithm a number of times to get runs' statistics
+'''
 import argparse
 import statistics
 from ge.core.genetic_executor import GeneticExecutor

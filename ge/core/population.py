@@ -3,23 +3,29 @@ import statistics
 import sys
 
 class Population:
-    def __init__(self,
-                 individual_class,
-                 individual_kwargs=None,
-                 size=200,
-                 expansion_factor=5,
-                 log_metadata=False):
+    def __init__(self, **kwargs):         
+        prop_defaults = {
+            'individual_class': None,
+            'individual_kwargs': {'size': 10}, 
+            'population_size': 200,
+            'expansion_factor': 5,
+            'log_metadata': False,
+        }
+
+        for (prop, default) in prop_defaults.items():
+            setattr(self, prop, kwargs.get(prop, default))
+            
+        if self.individual_class is None:
+            raise TypeError("You must pass an individual_class parameter to Population")
+        
         self.population = []
-        self.size = size
-        self.expansion_factor = expansion_factor
         fitness_values = []
         
-        self.log_metadata = log_metadata
         self.individuals_id = 0
         self.generations_log = []
         
-        for _ in range(self.size):
-            individual = individual_class(**individual_kwargs)
+        for _ in range(self.population_size):
+            individual = self.individual_class(**self.individual_kwargs)
             individual.chromosome = individual.get_random_chromosome()
             if self.log_metadata:
                 individual.id = self.get_id()
@@ -53,9 +59,9 @@ class Population:
         
         
     def get_individual_moving_window(self, percentage):
-        window_size = self.size / 10
-        lower_bound = int(percentage * (self.size - window_size))
-        upper_bound = int(window_size + percentage * (self.size - window_size - 1))
+        window_size = self.population_size / 10
+        lower_bound = int(percentage * (self.population_size - window_size))
+        upper_bound = int(window_size + percentage * (self.population_size - window_size - 1))
         if upper_bound - 1 > lower_bound:
             upper_bound = upper_bound - 1
         #print(percentage, lower_bound, upper_bound)
@@ -103,10 +109,10 @@ class Population:
         #                              for individual in self.population)
         #             for i in range(self.population[0].size)]
         #print(std_genes)
-        for iter_num in range(self.size * (self.expansion_factor - 1)):
+        for iter_num in range(self.population_size * (self.expansion_factor - 1)):
             #parent1 = self.get_individual_with_uniform_choice()
             #parent2 = self.get_individual_with_uniform_choice()
-            window_percentage = iter_num / (self.size * (self.expansion_factor - 1))
+            window_percentage = iter_num / (self.population_size * (self.expansion_factor - 1))
             parent1 = self.get_individual_moving_window(window_percentage)
             parent2 = self.get_individual_moving_window(window_percentage)
             child = parent1.get_child(parent2)
@@ -131,6 +137,6 @@ class Population:
         
         
     def cut_population(self):
-        self.population = self.population[0:self.size - 1]
+        self.population = self.population[0:self.population_size - 1]
             
             

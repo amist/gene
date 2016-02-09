@@ -1,9 +1,4 @@
 import random
-import copy
-import statistics
-import sys
-import math
-import pickle
 
 class Individual:
     def __init__(self):
@@ -21,6 +16,7 @@ class Individual:
     def get_child(self, parent2, mutation_factor=1):
         # TODO: separate into two functions: crossover, mutation
         # TODO: get rid of mutation_factor parameter
+        # TODO: define lower_bound, upper_bound, kwargs in __init__ or remove their usage in get_child
         
         child = self.__class__(**self.kwargs)
         for i in range(self.size):

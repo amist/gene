@@ -1,3 +1,5 @@
+'''An example for usage to get one solution
+'''
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
 

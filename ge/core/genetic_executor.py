@@ -2,14 +2,11 @@ import pickle
 from .population import Population
 
 class GeneticExecutor:
-
-    # def __init__(self, individual_class, individual_kwargs=None, population_size=200,
-                 # max_generations_number=100, debug=False, log_metadata=False):
     def __init__(self, **kwargs):
         
         prop_defaults = {
             'individual_class': None,
-            'individual_kwargs': None, 
+            'individual_kwargs': {'size': 10}, 
             'population_size': 200,
             'max_generations_number': 100,
             'debug': False,
@@ -39,7 +36,7 @@ class GeneticExecutor:
     def get_solution(self):
         population = Population(individual_class=self.individual_class,
                                 individual_kwargs=self.individual_kwargs,
-                                size=self.population_size,
+                                population_size=self.population_size,
                                 log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
