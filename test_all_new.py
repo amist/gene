@@ -2,14 +2,22 @@ import sys
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
 
-def test_problem(individual_class, kwargs, target_value):
+def test_problem(individual_class, individual_kwargs, target_value):
     print(individual_class.__name__, end=' ')
     sys.stdout.flush()
     TIMES_TO_FAIL = 5
     
+    ge_config = {'individual_class': individual_class,
+                 'individual_kwargs': individual_kwargs,
+                 'population_size': 200,
+                 'max_generations_number': 100,
+                 'debug': False,
+                 'log_metadata': False,
+                }
+    
     # Randomized algorithm, so it needs to fail TIMES_TO_FAIL times to be considered failure
     for _ in range(TIMES_TO_FAIL):
-        ge = GeneticExecutor(individual_class, kwargs, population_size=200, max_generations_number=100)    
+        ge = GeneticExecutor(**ge_config)    
         solution = ge.get_solution()
         print(solution.get_fitness_value(), end=' ')
         sys.stdout.flush()
