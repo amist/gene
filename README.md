@@ -1,6 +1,9 @@
 # gene
 Initial experimentations with genetic algorithms.
 
+# Status
+[![Build Status](https://travis-ci.org/amist/gene.svg?branch=master)](https://travis-ci.org/amist/gene)
+
 # Usage
 `<python executable> <problem name>`
 
