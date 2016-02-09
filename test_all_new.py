@@ -2,7 +2,7 @@ import sys
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
 
-def test_plan(individual_class, kwargs, target_value):
+def test_problem(individual_class, kwargs, target_value):
     print(individual_class.__name__, end=' ')
     sys.stdout.flush()
     TIMES_TO_FAIL = 5
@@ -29,13 +29,13 @@ def test_plan(individual_class, kwargs, target_value):
     
 def test_all():
     result = True
-    result &= test_plan(SphereIndividual, {'size': 10}, 1e-100)
-    #result &= test_plan(SphereAggregatedFitnessPlan(10), 0)
-    #result &= test_plan(SchwefelDoubleSumPlanNaive(10), 1)
-    #result &= test_plan(SchwefelDoubleSumPlanSeparable(10), 1e-4)
-    #result &= test_plan(RosenbrockPlanNaive(10), 8)
-    #result &= test_plan(RosenbrockPlanSeparable(10), 0.005)
-    #result &= test_plan(SchwefelSinPlanNaive(10), 0.001)
+    result &= test_problem(SphereIndividual, {'size': 10}, 1e-100)
+    #result &= test_problem(SphereAggregatedFitnessPlan(10), 0)
+    #result &= test_problem(SchwefelDoubleSumPlanNaive(10), 1)
+    #result &= test_problem(SchwefelDoubleSumPlanSeparable(10), 1e-4)
+    #result &= test_problem(RosenbrockPlanNaive(10), 8)
+    #result &= test_problem(RosenbrockPlanSeparable(10), 0.005)
+    #result &= test_problem(SchwefelSinPlanNaive(10), 0.001)
     
     print('== Finished ==')
     if result:

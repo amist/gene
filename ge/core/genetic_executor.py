@@ -3,15 +3,32 @@ from .population import Population
 
 class GeneticExecutor:
 
-    def __init__(self, individual_class, individual_kwargs=None, population_size=200,
-                 max_generations_number=100, debug=False, log_metadata=False):
-        #self.individual_instance = copy.deepcopy(individual_instance)
-        self.individual_kwargs = individual_kwargs
-        self.individual_class = individual_class
-        self.population_size = population_size
-        self.max_generations_number = max_generations_number
-        self.debug = debug
-        self.log_metadata = log_metadata
+    # def __init__(self, individual_class, individual_kwargs=None, population_size=200,
+                 # max_generations_number=100, debug=False, log_metadata=False):
+    def __init__(self, **kwargs):
+        
+        prop_defaults = {
+            'individual_class': None,
+            'individual_kwargs': None, 
+            'population_size': 200,
+            'max_generations_number': 100,
+            'debug': False,
+            'log_metadata': False,
+        }
+
+        for (prop, default) in prop_defaults.items():
+            setattr(self, prop, kwargs.get(prop, default))
+            
+        if self.individual_class is None:
+            raise TypeError("You must pass an individual_class parameter to GeneticExecutor")
+            
+        # #self.individual_instance = copy.deepcopy(individual_instance)
+        # self.individual_kwargs = individual_kwargs
+        # self.individual_class = kwargs.get('individual_class')
+        # self.population_size = population_size
+        # self.max_generations_number = max_generations_number
+        # self.debug = debug
+        # self.log_metadata = log_metadata
         
         
     def print_debug_info(self, population, i):
