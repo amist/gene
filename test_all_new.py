@@ -12,7 +12,7 @@ def test_problem(individual_class, individual_kwargs, target_value):
                  'population_size': 200,
                  'max_generations_number': 100,
                  'debug': False,
-                 'log_metadata': False,
+                 'log_metadata': None,
                 }
     
     # Randomized algorithm, so it needs to fail TIMES_TO_FAIL times to be considered failure
