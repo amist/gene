@@ -3,13 +3,14 @@ import statistics
 import sys
 
 class Population:
-    def __init__(self, **kwargs):         
+    def __init__(self, **kwargs):
+        # TODO: set the members statically, then run on kwargs keys
         prop_defaults = {
             'individual_class': None,
             'individual_kwargs': {'size': 10}, 
             'population_size': 200,
             'expansion_factor': 5,
-            'log_metadata': False,
+            'log_metadata': {'log_filename': 'generations_data.p'},
         }
 
         for (prop, default) in prop_defaults.items():
@@ -22,23 +23,27 @@ class Population:
         fitness_values = []
         
         self.individuals_id = 0
+        # TODO: rename generations_log
         self.generations_log = []
         
         for _ in range(self.population_size):
             individual = self.individual_class(**self.individual_kwargs)
             individual.chromosome = individual.get_random_chromosome()
-            if self.log_metadata:
+            if self.log_metadata is not None:
+                # TODO: get unique id from Individual (maybe with id(self) - consider range limitation)
                 individual.id = self.get_id()
+                # TODO: set parents' ids into list (for variable number of parents)
                 individual.parent1_id = -1
                 individual.parent2_id = -1
             self.population.append(individual)
             fitness_values.append(individual.get_fitness_value())
+        # TODO: choose convergence checking method dynamically
         try:
             self.initial_population_std = statistics.stdev(fitness_values)
         except OverflowError:
             self.initial_population_std = int(sys.float_info.max / 10)
             
-        if self.log_metadata:
+        if self.log_metadata is not None:
             self.generations_log.append(self.get_population_log())
         
         
@@ -90,7 +95,7 @@ class Population:
     def process_generation(self):
         self.expand_population()
         self.sort_population()
-        if self.log_metadata:
+        if self.log_metadata is not None:
             self.generations_log.append(self.get_population_log())
         self.cut_population()
         
@@ -113,10 +118,12 @@ class Population:
             #parent1 = self.get_individual_with_uniform_choice()
             #parent2 = self.get_individual_with_uniform_choice()
             window_percentage = iter_num / (self.population_size * (self.expansion_factor - 1))
+            # TODO: choose dynamically the parents choosing method
             parent1 = self.get_individual_moving_window(window_percentage)
             parent2 = self.get_individual_moving_window(window_percentage)
             child = parent1.get_child(parent2)
-            if self.log_metadata:
+            # TODO: extract into tag_child function
+            if self.log_metadata is not None:
                 child.id = self.get_id()
                 child.parent1_id = parent1.id
                 child.parent2_id = parent2.id
@@ -125,7 +132,7 @@ class Population:
             child = parent1.get_child(parent2,
                                       cur_population_std / (self.initial_population_std + 1))
             #child = parent1.get_child(parent2, mean_genes, std_genes)
-            if self.log_metadata:
+            if self.log_metadata is not None:
                 child.id = self.get_id()
                 child.parent1_id = parent1.id
                 child.parent2_id = parent2.id

@@ -9,7 +9,7 @@ if __name__ == '__main__':
                  'population_size': 200,
                  'max_generations_number': 100,
                  'debug': False,
-                 'log_metadata': False,
+                 'log_metadata': {'log_filename': 'generations_data.p'},
                 }
     ge = GeneticExecutor(**ge_config)
     solution = ge.get_solution()

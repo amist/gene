@@ -2,15 +2,17 @@ import pickle
 from .population import Population
 
 class GeneticExecutor:
+    # TODO: add get_run_history (or something similar) alongside get_solution
+    # TODO: modularize get_solution for use with get_run_history
     def __init__(self, **kwargs):
-        
+        # TODO: set the members statically, then run on kwargs keys
         prop_defaults = {
             'individual_class': None,
             'individual_kwargs': {'size': 10}, 
             'population_size': 200,
             'max_generations_number': 100,
             'debug': False,
-            'log_metadata': False,
+            'log_metadata': None,
         }
 
         for (prop, default) in prop_defaults.items():
@@ -34,6 +36,7 @@ class GeneticExecutor:
         print('  Current optimal solution: ' + str(population.population[0].chromosome))
         
     def get_solution(self):
+        # TODO: initialize population with config object
         population = Population(individual_class=self.individual_class,
                                 individual_kwargs=self.individual_kwargs,
                                 population_size=self.population_size,
@@ -49,6 +52,6 @@ class GeneticExecutor:
                 break
         if self.debug:
             population.population[0].print_chromosome()
-        if self.log_metadata:
-            pickle.dump(population.generations_log, open('generations_data.p', 'wb'))
+        if self.log_metadata is not None:
+            pickle.dump(population.generations_log, open(self.log_metadata.get('log_filename'), 'wb'))
         return population.population[0]

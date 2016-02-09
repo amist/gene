@@ -17,6 +17,9 @@ class Individual:
         # TODO: separate into two functions: crossover, mutation
         # TODO: get rid of mutation_factor parameter
         # TODO: define lower_bound, upper_bound, kwargs in __init__ or remove their usage in get_child
+        # TODO: crossover between arbitrary number of parents
+        # TODO: consider mutating the whole population at the end of each generation, decoupling mutation_factor
+        # TODO: consider mutating more the unfit (possible when mutating in population level)
         
         child = self.__class__(**self.kwargs)
         for i in range(self.size):
