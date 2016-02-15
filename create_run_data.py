@@ -1,5 +1,6 @@
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
+from ge.problems.sphere_aggregated_problem import SphereAggregatedIndividual
 import random
 import sys
 import json
@@ -10,13 +11,19 @@ if __name__ == '__main__':
         print('Usage: python ' + sys.argv[0] + ' <output data filename> <Individual class> [<more Individual classes>]')
         sys.exit(1)
     filename = sys.argv[1]
-    classes = [globals()[sys.argv[i]] for i in range(2, len(sys.argv))]
+    try:
+        classes = [globals()[sys.argv[i]] for i in range(2, len(sys.argv))]
+    except KeyError as err:
+        print('Could not load the class {}. Maybe there is a class name typo, or you forgot to import the class.'.format(err))
+        exit(1)
     # print(classes)
     # exit(0)
     all_data = []
     
     for _class in classes:
-        ge_config = {'individual_class': SphereIndividual,
+        print(_class.__name__)
+        
+        ge_config = {'individual_class': _class,
                      'individual_kwargs': {'size': 10},
                      'population_size': 200,
                      'max_generations_number': 100,
@@ -29,8 +36,10 @@ if __name__ == '__main__':
         solution, cur_data = ge.get_full_data()
         all_data.append(cur_data)
         
+        print(solution.chromosome)
+        print(solution.get_fitness_value())
+        
     with open(filename, 'w') as outfile:
         json.dump(all_data, outfile)
                 
-    print(solution.chromosome)
-    print(solution.get_fitness_value())
+    

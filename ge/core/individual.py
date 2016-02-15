@@ -11,6 +11,10 @@ class Individual:
         for _ in range(self.size):
             chromosome.append(random.uniform(self.lower_bound, self.upper_bound))
         return chromosome
+        
+        
+    def get_crossover_list(self, parent2):
+        return [0 if random.randint(0, 1) == 0 else 1 for _ in range(self.size)]
     
     
     def get_child(self, parent2, mutation_factor=1):
@@ -22,12 +26,13 @@ class Individual:
         # TODO: consider mutating more the unfit (possible when mutating in population level)
         
         child = self.__class__(**self.kwargs)
+        
+        # crossover
+        crossover_list = self.get_crossover_list(parent2)
+        both_chromosomes = [self.chromosome, parent2.chromosome]
+        child.chromosome = [both_chromosomes[crossover_list[i]][i] for i in range(self.size)]
+        
         for i in range(self.size):
-            # crossover
-            child.chromosome.append(self.chromosome[i]
-                                    if random.randint(0, 1) == 0
-                                    else parent2.chromosome[i])
-            
             # mutate
             if random.randint(1, int(10 * self.size / (mutation_factor + 1))) == 1:
                 child.chromosome[i] = mutation_factor * \
