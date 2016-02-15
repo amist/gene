@@ -1,10 +1,13 @@
-import pickle
+# import pickle
+import json
 from .population import Population
 
 class GeneticExecutor:
     # TODO: add get_run_history (or something similar) alongside get_solution
     # TODO: modularize get_solution for use with get_run_history
     def __init__(self, **kwargs):
+        self.population = None
+        
         # TODO: set the members statically, then run on kwargs keys
         prop_defaults = {
             'individual_class': None,
@@ -37,21 +40,27 @@ class GeneticExecutor:
         
     def get_solution(self):
         # TODO: initialize population with config object
-        population = Population(individual_class=self.individual_class,
+        self.population = Population(individual_class=self.individual_class,
                                 individual_kwargs=self.individual_kwargs,
                                 population_size=self.population_size,
                                 log_metadata=self.log_metadata)
         
         for i in range(self.max_generations_number):
-            population.process_generation()
+            self.population.process_generation()
             if self.debug:
                 self.print_debug_info(population, i)
-            if population.population[0].get_fitness_value() == population.population[0].get_optimal_value():
+            if self.population.population[0].get_fitness_value() == self.population.population[0].get_optimal_value():
                 if self.debug:
                     print('== Optimal value has been reached! ==')
                 break
         if self.debug:
-            population.population[0].print_chromosome()
+            self.population.population[0].print_chromosome()
         if self.log_metadata is not None:
-            pickle.dump(population.generations_log, open(self.log_metadata.get('log_filename'), 'wb'))
-        return population.population[0]
+            # pickle.dump(self.population.generations_log, open(self.log_metadata.get('log_filename'), 'wb'))
+            with open(self.log_metadata.get('log_filename'), 'w') as outfile:
+                json.dump(self.population.generations_log, outfile)
+        return self.population.population[0]
+        
+    def get_full_data(self):
+        solution = self.get_solution()
+        return self.population.population[0], self.population.generations_log
