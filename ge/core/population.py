@@ -26,6 +26,9 @@ class Population:
         # TODO: rename generations_log
         self.generations_log = []
         
+        # quick and ugly
+        self.individual_class.average_gene = [0] * self.individual_kwargs['size']
+        
         for _ in range(self.population_size):
             individual = self.individual_class(**self.individual_kwargs)
             individual.chromosome = individual.get_random_chromosome()
@@ -67,9 +70,11 @@ class Population:
         window_size = self.population_size / 10
         lower_bound = int(percentage * (self.population_size - window_size))
         upper_bound = int(window_size + percentage * (self.population_size - window_size - 1))
-        if upper_bound - 1 > lower_bound:
-            upper_bound = upper_bound - 1
-        #print(percentage, lower_bound, upper_bound)
+        # if upper_bound - 1 > lower_bound:
+            # upper_bound = upper_bound - 1
+        if upper_bound < lower_bound:
+            upper_bound, lower_bound = lower_bound, upper_bound
+        # print(percentage, lower_bound, upper_bound)
         return self.population[random.randint(lower_bound, upper_bound)]
         
         

@@ -45,7 +45,27 @@ class GeneticExecutor:
                                 population_size=self.population_size,
                                 log_metadata=self.log_metadata)
         
+        
         for i in range(self.max_generations_number):
+            # quick and ugly
+            try:
+                prev_average_gene = self.individual_class.average_gene
+                if len(prev_average_gene) == 0:
+                    prev_average_gene = [0] * self.individual_kwargs['size']
+                self.individual_class.average_gene = []
+                for k in range(self.individual_kwargs['size']):
+                    # print(i)
+                    # print(k)
+                    _sum = 0
+                    for j in range(len(self.population.population)):
+                        _sum += float(self.population.population[j].chromosome[k])
+                    # self.individual_class.average_gene.append(float(prev_average_gene[k]) + float(_sum / len(self.population.population)))
+                    self.individual_class.average_gene.append(float(_sum) / float(len(self.population.population)))
+                    
+            except AttributeError:
+                pass
+            
+            
             self.population.process_generation()
             if self.debug:
                 self.print_debug_info(population, i)
@@ -53,12 +73,17 @@ class GeneticExecutor:
                 if self.debug:
                     print('== Optimal value has been reached! ==')
                 break
+                
         if self.debug:
             self.population.population[0].print_chromosome()
         if self.log_metadata is not None:
             # pickle.dump(self.population.generations_log, open(self.log_metadata.get('log_filename'), 'wb'))
             with open(self.log_metadata.get('log_filename'), 'w') as outfile:
                 json.dump(self.population.generations_log, outfile)
+                
+        for i in range(len(self.population.population)):
+            print(self.population.population[i].chromosome)
+                
         return self.population.population[0]
         
     def get_full_data(self):

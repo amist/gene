@@ -2,9 +2,10 @@
 '''
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
+from ge.problems.sphere42_problem import Sphere42Individual
 
 if __name__ == '__main__':
-    ge_config = {'individual_class': SphereIndividual,
+    ge_config = {'individual_class': Sphere42Individual,
                  'individual_kwargs': {'size': 10},
                  'population_size': 200,
                  'max_generations_number': 100,
@@ -15,3 +16,5 @@ if __name__ == '__main__':
     solution = ge.get_solution()
     print(solution.chromosome)
     print(solution.get_fitness_value())
+    print(Sphere42Individual.average_gene)
+    
