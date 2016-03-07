@@ -16,6 +16,7 @@ class GeneticExecutor:
             'max_generations_number': 100,
             'debug': False,
             'log_metadata': None,
+            'mutation_a_b': True,
         }
 
         for (prop, default) in prop_defaults.items():
@@ -36,19 +37,20 @@ class GeneticExecutor:
     def print_debug_info(self, population, i):
         print('Generation %d has been processed' % i)
         print('  Current maximum fitness value = %f' % population.population[0].get_fitness_value())
-        print('  Current optimal solution: ' + str(population.population[0].chromosome))
+        # print('  Current optimal solution: ' + str(population.population[0].chromosome))
         
     def get_solution(self):
         # TODO: initialize population with config object
         self.population = Population(individual_class=self.individual_class,
                                 individual_kwargs=self.individual_kwargs,
                                 population_size=self.population_size,
-                                log_metadata=self.log_metadata)
+                                log_metadata=self.log_metadata,
+                                mutation_a_b=self.mutation_a_b)
         
         for i in range(self.max_generations_number):
             self.population.process_generation()
             if self.debug:
-                self.print_debug_info(population, i)
+                self.print_debug_info(self.population, i)
             if self.population.population[0].get_fitness_value() == self.population.population[0].get_optimal_value():
                 if self.debug:
                     print('== Optimal value has been reached! ==')

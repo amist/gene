@@ -17,7 +17,9 @@ class Individual:
         return [0 if random.randint(0, 1) == 0 else 1 for _ in range(self.size)]
     
     
-    def get_child(self, parent2, mutation_factor=1):
+    def get_child(self, parent2, mutation_params=None):
+        if mutation_params is None:
+            mutation_params = {'mutation_prob_factor': 1, 'mutation_amp_factor': 1}
         # TODO: separate into two functions: crossover, mutation
         # TODO: get rid of mutation_factor parameter
         # TODO: define lower_bound, upper_bound, kwargs in __init__ or remove their usage in get_child
@@ -34,8 +36,8 @@ class Individual:
         
         for i in range(self.size):
             # mutate
-            if random.randint(1, int(10 * self.size / (mutation_factor + 1))) == 1:
-                child.chromosome[i] = mutation_factor * \
+            if random.randint(0, int(1 * self.size / (mutation_params['mutation_prob_factor'] + 1))) == 0:
+                child.chromosome[i] = mutation_params['mutation_amp_factor'] * \
                                       random.uniform(self.lower_bound, self.upper_bound)
         return child
         

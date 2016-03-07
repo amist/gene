@@ -25,8 +25,8 @@ if __name__ == '__main__':
         
         ge_config = {'individual_class': _class,
                      'individual_kwargs': {'size': 10},
-                     'population_size': 200,
-                     'max_generations_number': 100,
+                     'population_size': 20,
+                     'max_generations_number': 20,
                      'debug': False,
                      'log_metadata': {'log_filename': 'temp_' + filename},
                      # 'log_metadata': None,

@@ -11,6 +11,7 @@ class Population:
             'population_size': 200,
             'expansion_factor': 5,
             'log_metadata': {'log_filename': 'generations_data.p'},
+            'mutation_a_b': True,
         }
 
         for (prop, default) in prop_defaults.items():
@@ -35,6 +36,8 @@ class Population:
                 # TODO: set parents' ids into list (for variable number of parents)
                 individual.parent1_id = -1
                 individual.parent2_id = -1
+            if self.mutation_a_b:
+                individual.tag = 0
             self.population.append(individual)
             fitness_values.append(individual.get_fitness_value())
         # TODO: choose convergence checking method dynamically
@@ -45,6 +48,11 @@ class Population:
             
         if self.log_metadata is not None:
             self.generations_log.append(self.get_population_log())
+            
+        if self.mutation_a_b:
+            init_mutation_prob = self.individual_kwargs['size']
+            self.mutation_params_list = [{'mutation_prob_factor': init_mutation_prob, 'mutation_amp_factor': 1},
+                                         {'mutation_prob_factor': 10 * init_mutation_prob, 'mutation_amp_factor': 1}]
         
         
     def get_id(self):
@@ -92,12 +100,26 @@ class Population:
         # assert False, "In get_individual_with_weighted_choice. Shouldn't get here"
         
         
+    def assess_a_b(self):
+        a_survivors = sum([1 for individual in self.population[:max(6, int(len(self.population)/10))] if individual.tag == 0])
+        b_survivors = sum([1 for individual in self.population[:max(6, int(len(self.population)/10))] if individual.tag == 1])
+        # print('{} - {} ({} - {})'.format(a_survivors, b_survivors, self.mutation_params_list[0]['mutation_prob_factor'], self.mutation_params_list[1]['mutation_prob_factor']))
+        # TODO: check difference in STD
+        # TODO: handle integer/float overflow
+        if a_survivors > 1.1 * b_survivors:
+            self.mutation_params_list[1]['mutation_prob_factor'] *= (self.mutation_params_list[0]['mutation_prob_factor'] / self.mutation_params_list[1]['mutation_prob_factor']) ** 2
+        if b_survivors > 1.1 * a_survivors:
+            self.mutation_params_list[0]['mutation_prob_factor'] *= (self.mutation_params_list[1]['mutation_prob_factor'] / self.mutation_params_list[0]['mutation_prob_factor']) ** 2
+        
+        
     def process_generation(self):
         self.expand_population()
         self.sort_population()
         if self.log_metadata is not None:
             self.generations_log.append(self.get_population_log())
         self.cut_population()
+        if self.mutation_a_b:
+            self.assess_a_b()
         
         
     def expand_population(self):
@@ -121,21 +143,31 @@ class Population:
             # TODO: choose dynamically the parents choosing method
             parent1 = self.get_individual_moving_window(window_percentage)
             parent2 = self.get_individual_moving_window(window_percentage)
-            child = parent1.get_child(parent2)
+            mutation_params = {'mutation_prob_factor': self.mutation_params_list[0]['mutation_prob_factor'],
+                               'mutation_amp_factor': cur_population_std / (self.initial_population_std + 1)}
+            child = parent1.get_child(parent2, mutation_params)
             # TODO: extract into tag_child function
             if self.log_metadata is not None:
                 child.id = self.get_id()
                 child.parent1_id = parent1.id
                 child.parent2_id = parent2.id
+            if self.mutation_a_b:
+                child.tag = 0
             self.population.append(child)
             
-            child = parent1.get_child(parent2,
-                                      cur_population_std / (self.initial_population_std + 1))
+            # mutation_params = {'mutation_prob_factor': cur_population_std / (self.initial_population_std + 1),
+                               # 'mutation_amp_factor': cur_population_std / (self.initial_population_std + 1)}
+            mutation_params = {'mutation_prob_factor': self.mutation_params_list[1]['mutation_prob_factor'],
+                               'mutation_amp_factor': cur_population_std / (self.initial_population_std + 1)}
+            # mutation_params = self.mutation_params_list[1]
+            child = parent1.get_child(parent2, mutation_params)
             #child = parent1.get_child(parent2, mean_genes, std_genes)
             if self.log_metadata is not None:
                 child.id = self.get_id()
                 child.parent1_id = parent1.id
                 child.parent2_id = parent2.id
+            if self.mutation_a_b:
+                child.tag = 1
             self.population.append(child)
         
         

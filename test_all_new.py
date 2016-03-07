@@ -2,6 +2,7 @@ import sys
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
 from ge.problems.sphere_aggregated_problem import SphereAggregatedIndividual
+import main
 
 def test_problem(individual_class, individual_kwargs, target_value):
     print(individual_class.__name__, end=' ')
@@ -36,8 +37,21 @@ def test_problem(individual_class, individual_kwargs, target_value):
     return False
     
     
+def test_examples():
+    print('main.py', end=' ')
+    sys.stdout.flush()
+    try:
+        main.get_solution()
+        print('OK')
+        return True
+    except Exception:
+        print('FAIL')
+        return False
+    
+    
 def test_all():
     result = True
+    result &= test_examples()
     result &= test_problem(SphereIndividual, {'size': 10}, 1e-100)
     result &= test_problem(SphereAggregatedIndividual, {'size': 10}, 0)
     #result &= test_problem(SchwefelDoubleSumPlanNaive(10), 1)
