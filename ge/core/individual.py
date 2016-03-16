@@ -37,8 +37,17 @@ class Individual:
         for i in range(self.size):
             # mutate
             if random.randint(0, int(1 * self.size / (mutation_params['mutation_prob_factor'] + 1))) == 0:
-                child.chromosome[i] = mutation_params['mutation_amp_factor'] * \
-                                      random.uniform(self.lower_bound, self.upper_bound)
+                # print('before mutation: {}'.format(child.chromosome))
+                # child.chromosome[i] = mutation_params['mutation_amp_factor'] * random.uniform(self.lower_bound, self.upper_bound)
+                delta = (mutation_params['mutation_amp_factor']) * random.uniform(self.lower_bound, self.upper_bound)
+                child.chromosome[i] += delta
+                # print('delta was {}'.format(delta))
+                if child.chromosome[i] > self.upper_bound:
+                    child.chromosome[i] = self.upper_bound
+                if child.chromosome[i] < self.lower_bound:
+                    child.chromosome[i] = self.lower_bound
+                # print('after mutation:  {}'.format(child.chromosome))
+                # print('mutation factor was: {}'.format(mutation_params['mutation_amp_factor']))
         return child
         
         

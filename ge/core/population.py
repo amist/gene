@@ -1,4 +1,5 @@
 import random
+import math
 import statistics
 import sys
 
@@ -52,7 +53,9 @@ class Population:
         if self.mutation_a_b:
             init_mutation_prob = self.individual_kwargs['size']
             self.mutation_params_list = [{'mutation_prob_factor': init_mutation_prob, 'mutation_amp_factor': 1},
-                                         {'mutation_prob_factor': 10 * init_mutation_prob, 'mutation_amp_factor': 1}]
+                                         {'mutation_prob_factor': 2 * init_mutation_prob, 'mutation_amp_factor': 1}]
+                                         
+        self.generation_number = 0
         
         
     def get_id(self):
@@ -103,16 +106,19 @@ class Population:
     def assess_a_b(self):
         a_survivors = sum([1 for individual in self.population[:max(6, int(len(self.population)/10))] if individual.tag == 0])
         b_survivors = sum([1 for individual in self.population[:max(6, int(len(self.population)/10))] if individual.tag == 1])
+        # print(self.population[0].get_fitness_value())
         # print('{} - {} ({} - {})'.format(a_survivors, b_survivors, self.mutation_params_list[0]['mutation_prob_factor'], self.mutation_params_list[1]['mutation_prob_factor']))
         # TODO: check difference in STD
         # TODO: handle integer/float overflow
-        if a_survivors > 1.1 * b_survivors:
-            self.mutation_params_list[1]['mutation_prob_factor'] *= (self.mutation_params_list[0]['mutation_prob_factor'] / self.mutation_params_list[1]['mutation_prob_factor']) ** 2
-        if b_survivors > 1.1 * a_survivors:
-            self.mutation_params_list[0]['mutation_prob_factor'] *= (self.mutation_params_list[1]['mutation_prob_factor'] / self.mutation_params_list[0]['mutation_prob_factor']) ** 2
+        if self.mutation_params_list[0]['mutation_prob_factor'] > 1e-50 and self.mutation_params_list[1]['mutation_prob_factor'] > 1e-50:
+            if a_survivors > 1.1 * b_survivors:
+                self.mutation_params_list[1]['mutation_prob_factor'] *= (self.mutation_params_list[0]['mutation_prob_factor'] / (self.mutation_params_list[1]['mutation_prob_factor'])) ** (self.generation_number / 20)
+            if b_survivors > 1.1 * a_survivors:
+                self.mutation_params_list[0]['mutation_prob_factor'] *= (self.mutation_params_list[1]['mutation_prob_factor'] / (self.mutation_params_list[0]['mutation_prob_factor'])) ** (self.generation_number / 20)
         
         
     def process_generation(self):
+        self.generation_number += 1
         self.expand_population()
         self.sort_population()
         if self.log_metadata is not None:
@@ -144,7 +150,7 @@ class Population:
             parent1 = self.get_individual_moving_window(window_percentage)
             parent2 = self.get_individual_moving_window(window_percentage)
             mutation_params = {'mutation_prob_factor': self.mutation_params_list[0]['mutation_prob_factor'],
-                               'mutation_amp_factor': cur_population_std / (self.initial_population_std + 1)}
+                               'mutation_amp_factor': math.sqrt(cur_population_std / (self.initial_population_std + 1))}
             child = parent1.get_child(parent2, mutation_params)
             # TODO: extract into tag_child function
             if self.log_metadata is not None:
