@@ -1,28 +1,24 @@
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
 from ge.problems.sphere_aggregated_problem import SphereAggregatedIndividual
-from ge.core.populations.basic_population import BasicPopulation
-from ge.core.populations.medium_population import MediumPopulation
 import random
 import sys
 import json
 
 if __name__ == '__main__':
     # print(sys.argv)
-    if len(sys.argv) < 4:
-        print('Usage: python ' + sys.argv[0] + ' <output data filename> <Population class> <Individual class> [<more Individual classes>]')
+    if len(sys.argv) < 3:
+        print('Usage: python ' + sys.argv[0] + ' <output data filename> <Individual class> [<more Individual classes>]')
         sys.exit(1)
     filename = sys.argv[1]
     try:
-        classes = [globals()[sys.argv[i]] for i in range(3, len(sys.argv))]
+        classes = [globals()[sys.argv[i]] for i in range(2, len(sys.argv))]
     except KeyError as err:
         print('Could not load the class {}. Maybe there is a class name typo, or you forgot to import the class.'.format(err))
         exit(1)
     # print(classes)
     # exit(0)
     all_data = []
-    with open(filename) as data_file:
-        all_data = json.load(data_file)
     
     for _class in classes:
         print(_class.__name__)

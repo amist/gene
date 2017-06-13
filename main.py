@@ -3,13 +3,10 @@
 from ge.core.genetic_executor import GeneticExecutor
 from ge.problems.sphere_problem import SphereIndividual
 from ge.problems.schwefel_sin_naive_problem import SchwefelSinNaiveIndividual
-from ge.core.populations.basic_population import BasicPopulation
-from ge.core.populations.medium_population import MediumPopulation
 
 def get_solution():
     ge_config = {'individual_class': SphereIndividual,
                  'individual_kwargs': {'size': 10},
-                 'population_class': MediumPopulation,
                  'population_size': 200,
                  'max_generations_number': 100,
                  'debug': False,

@@ -1,7 +1,6 @@
 # import pickle
 import json
-# from .population import Population
-from .populations.default_population import DefaultPopulation
+from .population import Population
 
 class GeneticExecutor:
     # TODO: add get_run_history (or something similar) alongside get_solution
@@ -12,8 +11,7 @@ class GeneticExecutor:
         # TODO: set the members statically, then run on kwargs keys
         prop_defaults = {
             'individual_class': None,
-            'individual_kwargs': {'size': 10},
-            'population_class': DefaultPopulation,
+            'individual_kwargs': {'size': 10}, 
             'population_size': 200,
             'max_generations_number': 100,
             'debug': False,
@@ -43,7 +41,7 @@ class GeneticExecutor:
         
     def get_solution(self):
         # TODO: initialize population with config object
-        self.population = self.population_class(individual_class=self.individual_class,
+        self.population = Population(individual_class=self.individual_class,
                                 individual_kwargs=self.individual_kwargs,
                                 population_size=self.population_size,
                                 log_metadata=self.log_metadata,
